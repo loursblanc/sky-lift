@@ -114,4 +114,10 @@ public class Sport {
         return season;
     }
 
+    @Override
+    public String toString() {
+        return "Sport{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", description='" + description + '\''
+                + ", active=" + active + ", season=" + season + '}';
+    }
+
 }
