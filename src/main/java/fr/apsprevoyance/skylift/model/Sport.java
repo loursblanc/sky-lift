@@ -3,12 +3,20 @@ package fr.apsprevoyance.skylift.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
 import fr.apsprevoyance.skylift.enums.Season;
+import fr.apsprevoyance.skylift.enums.ValidationContextType;
+import fr.apsprevoyance.skylift.exception.ValidationException;
 import jakarta.annotation.Generated;
 import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.NotNull;
 
 public class Sport {
+
+    private static final Logger log = LoggerFactory.getLogger(Sport.Builder.class);
 
     @NotNull
     private final String id;
@@ -73,21 +81,25 @@ public class Sport {
         public Sport build() {
 
             List<String> errors = new ArrayList<>();
-            // TODO Gestion correct des erreurs
+
             if (id == null) {
-                errors.add("id ne peut pas être null");
+                errors.add(ErrorMessageConstants.Errors.ID_NULL);
             }
 
             if (name == null) {
-                errors.add("name ne peut pas être null");
+                errors.add(ErrorMessageConstants.Errors.NAME_NULL);
             }
 
             if (season == null) {
-                errors.add("season ne peut pas être null");
+                errors.add(ErrorMessageConstants.Errors.SEASON_NULL);
             }
 
             if (!errors.isEmpty()) {
-                throw new IllegalStateException("Sport invalide: " + String.join(", ", errors));
+
+                log.warn(ErrorMessageConstants.Logs.INVALID_OBJECT_BUILD, Sport.class.getSimpleName(),
+                        Sport.class.getPackage().getName(), String.join(", ", errors));
+
+                throw new ValidationException(Sport.class.getSimpleName(), ValidationContextType.MODEL, errors);
             }
 
             return new Sport(this);

@@ -47,5 +47,6 @@ public final class ErrorMessageConstants {
         public static final String VALIDATION_FAILED = "Validation failed for {} (context: {}): {}";
         public static final String METHOD_ARGS_VALIDATION_FAILED = "Method argument validation failed: {}";
         public static final String UNCAUGHT_EXCEPTION = "Uncaught exception: ";
+        public static final String INVALID_OBJECT_BUILD = "Attempting to build invalid {} object in package {}: {}";
     }
 }
