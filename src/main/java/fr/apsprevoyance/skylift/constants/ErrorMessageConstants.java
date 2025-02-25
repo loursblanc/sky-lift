@@ -14,6 +14,8 @@ public final class ErrorMessageConstants {
         public static final String FIELD_MAX_LENGTH = "%s exceeds maximum length of %d";
         public static final String FIELD_MIN_LENGTH = "%s must be at least %d characters long";
         public static final String FIELD_INVALID_FORMAT = "%s has invalid format";
+        public static final String FIELD_INVALID_CHARS = "%s can only contain letters (including accented characters), digits, spaces, and apostrophes";
+        public static final String FIELD_NOT_NUMERIC = "%s must contain only digits";
 
         public static final String PREFIX_DEFAULT = "Validation error";
         public static final String PREFIX_MODEL = "Model validation error";
@@ -32,6 +34,15 @@ public final class ErrorMessageConstants {
         public static final String ID_NULL = String.format(Validation.FIELD_NULL, Fields.ID);
         public static final String NAME_NULL = String.format(Validation.FIELD_NULL, Fields.NAME);
         public static final String SEASON_NULL = String.format(Validation.FIELD_NULL, Fields.SEASON);
+        public static final String ID_EMPTY = String.format(Validation.FIELD_EMPTY, Fields.ID);
+        public static final String NAME_EMPTY = String.format(Validation.FIELD_EMPTY, Fields.NAME);
+        public static final String NAME_TOO_LONG = String.format(Validation.FIELD_MAX_LENGTH, Fields.NAME,
+                ValidationConstants.NAME_MAX_LENGTH);
+        public static final String NAME_TOO_SHORT = String.format(Validation.FIELD_MIN_LENGTH, Fields.NAME,
+                ValidationConstants.NAME_MIN_LENGTH);
+        public static final String NAME_INVALID_CHARS = String.format(Validation.FIELD_INVALID_CHARS, Fields.NAME);
+        public static final String ID_NOT_NUMERIC = String.format(Validation.FIELD_NOT_NUMERIC, Fields.ID);
+
     }
 
     public static final class Formats {

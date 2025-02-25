@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
+import fr.apsprevoyance.skylift.constants.ValidationConstants;
 import fr.apsprevoyance.skylift.enums.Season;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.ValidationException;
@@ -15,8 +16,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.NotNull;
 
 public class Sport {
-
-    private static final Logger log = LoggerFactory.getLogger(Sport.Builder.class);
 
     @NotNull
     private final String id;
@@ -44,6 +43,9 @@ public class Sport {
 
     @Generated("SparkTools")
     public static final class Builder {
+
+        private static final Logger log = LoggerFactory.getLogger(Sport.Builder.class);
+
         private String id;
         private String name;
         private String description;
@@ -79,24 +81,10 @@ public class Sport {
         }
 
         public Sport build() {
-
-            List<String> errors = new ArrayList<>();
-
-            if (id == null) {
-                errors.add(ErrorMessageConstants.Errors.ID_NULL);
-            }
-
-            if (name == null) {
-                errors.add(ErrorMessageConstants.Errors.NAME_NULL);
-            }
-
-            if (season == null) {
-                errors.add(ErrorMessageConstants.Errors.SEASON_NULL);
-            }
+            List<String> errors = collectValidationErrors();
 
             if (!errors.isEmpty()) {
-
-                log.warn(ErrorMessageConstants.Logs.INVALID_OBJECT_BUILD, Sport.class.getSimpleName(),
+                log.warn(ErrorMessageConstants.Logs.VALIDATION_FAILED, Sport.class.getSimpleName(),
                         Sport.class.getPackage().getName(), String.join(", ", errors));
 
                 throw new ValidationException(Sport.class.getSimpleName(), ValidationContextType.MODEL, errors);
@@ -104,32 +92,78 @@ public class Sport {
 
             return new Sport(this);
         }
-    }
 
-    public String getId() {
-        return id;
-    }
+        private List<String> collectValidationErrors() {
+            List<String> errors = new ArrayList<>();
 
-    public String getName() {
-        return name;
-    }
+            collectIdErrors(errors);
+            collectNameErrors(errors);
+            collectSeasonErrors(errors);
 
-    public String getDescription() {
-        return description;
-    }
+            return errors;
+        }
 
-    public boolean isActive() {
-        return active;
-    }
+        private void collectIdErrors(List<String> errors) {
+            if (id == null) {
+                errors.add(ErrorMessageConstants.Errors.ID_NULL);
+            } else if (id.trim().isEmpty()) {
+                errors.add(ErrorMessageConstants.Errors.ID_EMPTY);
+            } else if (!id.matches(ValidationConstants.REGEX_NUMERIC)) {
+                errors.add(ErrorMessageConstants.Errors.ID_NOT_NUMERIC);
+            }
+        }
 
-    public Season getSeason() {
-        return season;
-    }
+        private void collectNameErrors(List<String> errors) {
+            if (name == null) {
+                errors.add(ErrorMessageConstants.Errors.NAME_NULL);
+            } else if (name.trim().isEmpty()) {
+                errors.add(ErrorMessageConstants.Errors.NAME_EMPTY);
+            } else {
+                String trimmedName = name.trim();
 
-    @Override
-    public String toString() {
-        return "Sport{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", description='" + description + '\''
-                + ", active=" + active + ", season=" + season + '}';
+                if (trimmedName.length() < ValidationConstants.NAME_MIN_LENGTH) {
+                    errors.add(ErrorMessageConstants.Errors.NAME_TOO_SHORT);
+                } else if (trimmedName.length() > ValidationConstants.NAME_MAX_LENGTH) {
+                    errors.add(ErrorMessageConstants.Errors.NAME_TOO_LONG);
+                }
+
+                if (!trimmedName.matches(ValidationConstants.REGEX_NAME_VALID_CHARS)) {
+                    errors.add(ErrorMessageConstants.Errors.NAME_INVALID_CHARS);
+                }
+            }
+        }
+
+        private void collectSeasonErrors(List<String> errors) {
+            if (season == null) {
+                errors.add(ErrorMessageConstants.Errors.SEASON_NULL);
+            }
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public boolean isActive() {
+            return active;
+        }
+
+        public Season getSeason() {
+            return season;
+        }
+
+        @Override
+        public String toString() {
+            return "Sport{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", description='" + description + '\''
+                    + ", active=" + active + ", season=" + season + '}';
+        }
     }
 
 }
