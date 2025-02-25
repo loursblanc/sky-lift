@@ -2,6 +2,7 @@ package fr.apsprevoyance.skylift.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,31 +140,50 @@ public class Sport {
             }
         }
 
-        public String getId() {
-            return id;
-        }
+    }
 
-        public String getName() {
-            return name;
-        }
+    public String getId() {
+        return id;
+    }
 
-        public String getDescription() {
-            return description;
-        }
+    public String getName() {
+        return name;
+    }
 
-        public boolean isActive() {
-            return active;
-        }
+    public String getDescription() {
+        return description;
+    }
 
-        public Season getSeason() {
-            return season;
-        }
+    public boolean isActive() {
+        return active;
+    }
 
-        @Override
-        public String toString() {
-            return "Sport{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", description='" + description + '\''
-                    + ", active=" + active + ", season=" + season + '}';
-        }
+    public Season getSeason() {
+        return season;
+    }
+
+    @Override
+    public String toString() {
+        return "Sport{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", description='" + description + '\''
+                + ", active=" + active + ", season=" + season + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(active, description, id, name, season);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Sport other = (Sport) obj;
+        return active == other.active && Objects.equals(description, other.description) && Objects.equals(id, other.id)
+                && Objects.equals(name, other.name) && season == other.season;
     }
 
 }
