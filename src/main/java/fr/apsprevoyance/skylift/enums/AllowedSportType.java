@@ -4,7 +4,10 @@ import fr.apsprevoyance.skylift.constants.SportLabels;
 
 public enum AllowedSportType {
 
-    SKI(SportLabels.SKI), SURF(SportLabels.SNOWBOARD), SNOWSCOOT(SportLabels.SNOWSCOOT), LUGE(SportLabels.SLEDGE);
+    SKI(SportLabels.SKI),
+    SNOWBOARD(SportLabels.SNOWBOARD),
+    SNOWSCOOT(SportLabels.SNOWSCOOT),
+    SLEDGE(SportLabels.SLEDGE);
 
     private final String label;
 
