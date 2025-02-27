@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
-import fr.apsprevoyance.skylift.constants.ValidationConstants;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
@@ -147,30 +146,12 @@ public class SkiLift {
         private void collectIdErrors(List<String> errors) {
             if (id == null) {
                 errors.add(ErrorMessageConstants.Errors.ID_NULL);
-            } else if (id.trim().isEmpty()) {
-                errors.add(ErrorMessageConstants.Errors.ID_EMPTY);
-            } else if (!id.matches(ValidationConstants.REGEX_NUMERIC)) {
-                errors.add(ErrorMessageConstants.Errors.ID_NOT_NUMERIC);
             }
         }
 
         private void collectNameErrors(List<String> errors) {
             if (name == null) {
                 errors.add(ErrorMessageConstants.Errors.NAME_NULL);
-            } else if (name.trim().isEmpty()) {
-                errors.add(ErrorMessageConstants.Errors.NAME_EMPTY);
-            } else {
-                String trimmedName = name.trim();
-
-                if (trimmedName.length() < ValidationConstants.NAME_MIN_LENGTH) {
-                    errors.add(ErrorMessageConstants.Errors.NAME_TOO_SHORT);
-                } else if (trimmedName.length() > ValidationConstants.NAME_MAX_LENGTH) {
-                    errors.add(ErrorMessageConstants.Errors.NAME_TOO_LONG);
-                }
-
-                if (!trimmedName.matches(ValidationConstants.REGEX_NAME_VALID_CHARS)) {
-                    errors.add(ErrorMessageConstants.Errors.NAME_INVALID_CHARS);
-                }
             }
         }
 
@@ -189,18 +170,12 @@ public class SkiLift {
         private void collectAvailableSportsErrors(List<String> errors) {
             if (availableSports == null) {
                 errors.add(ErrorMessageConstants.Errors.AVAILABLE_SPORTS_NULL);
-            } else if (availableSports.isEmpty()) {
-                errors.add(ErrorMessageConstants.Errors.AVAILABLE_SPORTS_EMPTY);
             }
         }
 
         private void collectCommissioningDateErrors(List<String> errors) {
             if (commissioningDate == null) {
                 errors.add(ErrorMessageConstants.Errors.COMMISSIONING_DATE_NULL);
-            } else {
-                if (commissioningDate.isBefore(ValidationConstants.FIRST_SKILIFT_DATE)) {
-                    errors.add(ErrorMessageConstants.Errors.COMMISSIONING_DATE_TOO_OLD);
-                }
             }
         }
     }

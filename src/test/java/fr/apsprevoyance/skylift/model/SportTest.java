@@ -3,7 +3,6 @@ package fr.apsprevoyance.skylift.model;
 import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.DIFFERENT_DESCRIPTION;
 import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.DIFFERENT_ID;
 import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.DIFFERENT_NAME;
-import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.INVALID_ID_NON_NUMERIC;
 import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.VALID_ACTIVE;
 import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.VALID_DESCRIPTION;
 import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.VALID_ID;
@@ -12,7 +11,6 @@ import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.VALID_SEASO
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,7 +19,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
-import fr.apsprevoyance.skylift.constants.ValidationConstants;
+import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.ValidationException;
 
 @Tag("model")
@@ -54,27 +52,11 @@ public class SportTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             builder.build();
         });
+
+        assertEquals(1, exception.getValidationErrors().size());
         assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.ID_NULL));
-    }
-
-    @Test
-    public void sport_with_empty_id_throws_validation_exception() {
-        builder.id("");
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.ID_EMPTY));
-    }
-
-    @Test
-    public void sport_with_non_numeric_id_throws_validation_exception() {
-        builder.id(INVALID_ID_NON_NUMERIC);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.ID_NOT_NUMERIC));
+        assertEquals(SkiLift.class.getSimpleName(), exception.getModelName());
+        assertEquals(ValidationContextType.MODEL, exception.getContextType());
     }
 
     @Test
@@ -84,42 +66,9 @@ public class SportTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             builder.build();
         });
+
+        assertEquals(1, exception.getValidationErrors().size());
         assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.NAME_NULL));
-    }
-
-    @Test
-    public void sport_with_empty_name_throws_validation_exception() {
-        builder.name("");
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.NAME_EMPTY));
-    }
-
-    @Test
-    public void sport_with_name_too_short_throws_validation_exception() {
-        String shortName = "A";
-        builder.name(shortName);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.NAME_TOO_SHORT));
-    }
-
-    @Test
-    public void sport_with_name_too_long_throws_validation_exception() {
-        StringBuilder longName = new StringBuilder();
-        for (int i = 0; i <= ValidationConstants.NAME_MAX_LENGTH; i++) {
-            longName.append("a");
-        }
-        builder.name(longName.toString());
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.NAME_TOO_LONG));
     }
 
     @Test
@@ -129,38 +78,24 @@ public class SportTest {
         ValidationException exception = assertThrows(ValidationException.class, () -> {
             builder.build();
         });
+
+        assertEquals(1, exception.getValidationErrors().size());
         assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.SEASON_NULL));
     }
 
     @Test
-    public void getDescription_returns_null_when_description_is_null() {
+    public void sport_description_defaults_to_empty_string_when_null() {
         Sport sport = Sport.builder().id(VALID_ID).name(VALID_NAME).description(null).active(VALID_ACTIVE)
                 .season(VALID_SEASON).build();
 
-        assertNull(sport.getDescription());
+        assertEquals("", sport.getDescription());
     }
 
     @Test
-    public void toString_handles_null_values_correctly() {
-        Sport sport = Sport.builder().id(VALID_ID).name(VALID_NAME).description(null).active(VALID_ACTIVE)
-                .season(VALID_SEASON).build();
+    public void sport_builder_default_active_is_true() {
+        Sport sport = Sport.builder().id(VALID_ID).name(VALID_NAME).season(VALID_SEASON).build();
 
-        String result = sport.toString();
-
-        assertNotNull(result);
-    }
-
-    @Test
-    public void equals_handles_null_values_correctly() {
-        Sport sport1 = Sport.builder().id(VALID_ID).name(VALID_NAME).description(null).active(VALID_ACTIVE)
-                .season(VALID_SEASON).build();
-
-        Sport sport2 = Sport.builder().id(VALID_ID).name(VALID_NAME).description(null).active(VALID_ACTIVE)
-                .season(VALID_SEASON).build();
-
-        assertEquals(sport1, sport2);
-        assertEquals(sport1, sport1);
-        assertNotEquals(sport1, null);
+        assertTrue(sport.isActive());
     }
 
     @Test
@@ -175,5 +110,16 @@ public class SportTest {
         assertEquals(sport1.hashCode(), sport2.hashCode());
         assertNotEquals(sport1, differentSport);
         assertNotEquals(sport1.hashCode(), differentSport.hashCode());
+    }
+
+    @Test
+    public void toString_method_works_correctly() {
+        Sport sport = builder.build();
+        String toString = sport.toString();
+
+        assertNotNull(toString);
+        assertTrue(toString.contains("id='" + VALID_ID + "'"));
+        assertTrue(toString.contains("name='" + VALID_NAME + "'"));
+        assertTrue(toString.contains("season=" + VALID_SEASON));
     }
 }

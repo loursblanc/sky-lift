@@ -7,25 +7,31 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.apsprevoyance.skylift.constants.AnnotationMessages;
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
 import fr.apsprevoyance.skylift.constants.ValidationConstants;
 import fr.apsprevoyance.skylift.enums.Season;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.ValidationException;
 import jakarta.annotation.Generated;
-import jakarta.annotation.Nonnull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public class Sport {
-
-    @NotNull
+    @NotBlank(message = AnnotationMessages.Id.EMPTY)
+    @Pattern(regexp = ValidationConstants.REGEX_NUMERIC, message = AnnotationMessages.Id.NOT_NUMERIC)
     private final String id;
-    @NotNull
+
+    @NotBlank(message = AnnotationMessages.Name.EMPTY)
+    @Size(min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TOO_SHORT)
+    @Pattern(regexp = ValidationConstants.REGEX_NAME_VALID_CHARS, message = AnnotationMessages.Name.INVALID_CHARS)
     private final String name;
     private final String description;
-    @NotNull
     private final boolean active;
-    @NotNull
+
+    @NotNull(message = AnnotationMessages.Season.NULL)
     private final Season season;
 
     @Generated("SparkTools")
@@ -56,92 +62,64 @@ public class Sport {
         private Builder() {
         }
 
-        public Builder id(@Nonnull String id) {
+        public Builder id(String id) {
             this.id = id;
             return this;
         }
 
-        public Builder name(@Nonnull String name) {
+        public Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder description(@Nonnull String description) {
-            this.description = description;
+        public Builder description(String description) {
+            this.description = description != null ? description : "";
             return this;
         }
 
-        public Builder active(@Nonnull boolean active) {
+        public Builder active(boolean active) {
             this.active = active;
             return this;
         }
 
-        public Builder season(@Nonnull Season season) {
+        public Builder season(Season season) {
             this.season = season;
             return this;
         }
 
         public Sport build() {
+
             List<String> errors = collectValidationErrors();
 
             if (!errors.isEmpty()) {
-                log.warn(ErrorMessageConstants.Logs.VALIDATION_FAILED, Sport.class.getSimpleName(),
-                        Sport.class.getPackage().getName(), String.join(", ", errors));
+                log.warn(ErrorMessageConstants.Logs.VALIDATION_FAILED, SkiLift.class.getSimpleName(),
+                        SkiLift.class.getPackage().getName(), String.join(", ", errors));
 
-                throw new ValidationException(Sport.class.getSimpleName(), ValidationContextType.MODEL, errors);
+                throw new ValidationException(SkiLift.class.getSimpleName(), ValidationContextType.MODEL, errors);
             }
 
             return new Sport(this);
         }
 
         private List<String> collectValidationErrors() {
-            List<String> errors = new ArrayList<>();
 
-            collectIdErrors(errors);
-            collectNameErrors(errors);
-            collectSeasonErrors(errors);
+            List<String> errors = new ArrayList<String>();
 
-            return errors;
-        }
-
-        private void collectIdErrors(List<String> errors) {
             if (id == null) {
                 errors.add(ErrorMessageConstants.Errors.ID_NULL);
-            } else if (id.trim().isEmpty()) {
-                errors.add(ErrorMessageConstants.Errors.ID_EMPTY);
-            } else if (!id.matches(ValidationConstants.REGEX_NUMERIC)) {
-                errors.add(ErrorMessageConstants.Errors.ID_NOT_NUMERIC);
             }
-        }
 
-        private void collectNameErrors(List<String> errors) {
             if (name == null) {
                 errors.add(ErrorMessageConstants.Errors.NAME_NULL);
-            } else if (name.trim().isEmpty()) {
-                errors.add(ErrorMessageConstants.Errors.NAME_EMPTY);
-            } else {
-                String trimmedName = name.trim();
-
-                if (trimmedName.length() < ValidationConstants.NAME_MIN_LENGTH) {
-                    errors.add(ErrorMessageConstants.Errors.NAME_TOO_SHORT);
-                } else if (trimmedName.length() > ValidationConstants.NAME_MAX_LENGTH) {
-                    errors.add(ErrorMessageConstants.Errors.NAME_TOO_LONG);
-                }
-
-                if (!trimmedName.matches(ValidationConstants.REGEX_NAME_VALID_CHARS)) {
-                    errors.add(ErrorMessageConstants.Errors.NAME_INVALID_CHARS);
-                }
             }
-        }
 
-        private void collectSeasonErrors(List<String> errors) {
             if (season == null) {
                 errors.add(ErrorMessageConstants.Errors.SEASON_NULL);
             }
+            return errors;
         }
-        
     }
-    
+
     public String getId() {
         return id;
     }
@@ -185,7 +163,4 @@ public class Sport {
         return active == other.active && Objects.equals(description, other.description) && Objects.equals(id, other.id)
                 && Objects.equals(name, other.name) && season == other.season;
     }
-    
-    
-
 }
