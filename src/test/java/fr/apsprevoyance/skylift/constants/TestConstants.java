@@ -24,7 +24,17 @@ public final class TestConstants {
     public static final String SKILIFT_VALID_COMMENT = "Main ski lift";
     public static final String SKILIFT_DIFFERENT_ID = "101112";
     public static final String SKILIFT_DIFFERENT_NAME = "Télécabine de la Combe";;
-    public static final String SKILIFT_DIFFERENT_COMMENT = "Closed for maintenance";;
+    public static final String SKILIFT_DIFFERENT_COMMENT = "Closed for maintenance";
+
+    public static final class FieldNames {
+        public static final String ID = "id";
+        public static final String NAME = "name";
+        public static final String TYPE = "type";
+        public static final String STATUS = "status";
+        public static final String COMMENT = "comment";
+        public static final String AVAILABLE_SPORTS = "availableSports";
+        public static final String COMMISSIONING_DATE = "commissioningDate";
+    }
 
     public static final class Sport {
         public static final String VALID_ID = SPORT_VALID_ID;
@@ -117,6 +127,13 @@ public final class TestConstants {
         public static final String DTO_DESCRIPTION_REPLACE_BLANK = "The description should be an empty string when you try to set it to null.";
 
         public static final String DEFAULT_ACTIVE = "The default value for active should be true";
+
+        public static final String ERROR_FOR_TYPE = "There should be an error for type";
+        public static final String ERROR_FOR_STATUS = "There should be an error for status";
+        public static final String ERROR_FOR_SPORTS = "There should be an error for available sports";
+        public static final String DATE_TOO_OLD_ERROR = "The date should not be before the first ski lift";
+        public static final String SPORTS_NEVER_NULL = "Available sports should never be null";
+        public static final String COMMENT_REPLACE_BLANK = "The comment should be an empty string when set to null";
 
         private ValidationTestMessages() {
         }
