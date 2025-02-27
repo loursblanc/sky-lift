@@ -139,9 +139,9 @@ public class Sport {
                 errors.add(ErrorMessageConstants.Errors.SEASON_NULL);
             }
         }
-
+        
     }
-
+    
     public String getId() {
         return id;
     }
@@ -185,5 +185,7 @@ public class Sport {
         return active == other.active && Objects.equals(description, other.description) && Objects.equals(id, other.id)
                 && Objects.equals(name, other.name) && season == other.season;
     }
+    
+    
 
 }
