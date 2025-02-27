@@ -112,6 +112,12 @@ public final class TestConstants {
         public static final String NAME_MIN_LENGTH = "Name must contain at least 3 characters";
         public static final String DATE_CANNOT_BE_NULL = "Date cannot be null";
 
+        public static final String DTO_DESCRIPTION_NULL = "A DTO with a null description should not generate any violations";
+        public static final String DTO_DESCRIPTION_NEVER_NULL = "The description should never be null, but an empty string";
+        public static final String DTO_DESCRIPTION_REPLACE_BLANK = "The description should be an empty string when you try to set it to null.";
+
+        public static final String DEFAULT_ACTIVE = "The default value for active should be true";
+
         private ValidationTestMessages() {
         }
     }
