@@ -99,8 +99,12 @@ public class SkiLift {
             return this;
         }
 
-        public Builder availableSports(@Nonnull Set<String> availableSports) {
-            this.availableSports = new HashSet<>(availableSports);
+        public Builder availableSports(Set<String> availableSports) {
+            if (availableSports == null) {
+                this.availableSports = null;
+            } else {
+                this.availableSports = new HashSet<>(availableSports);
+            }
             return this;
         }
 
