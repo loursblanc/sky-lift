@@ -1,6 +1,14 @@
 package fr.apsprevoyance.skylift.model;
 
-import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.*;
+import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.DIFFERENT_DESCRIPTION;
+import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.DIFFERENT_ID;
+import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.DIFFERENT_NAME;
+import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.INVALID_ID_NON_NUMERIC;
+import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.VALID_ACTIVE;
+import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.VALID_DESCRIPTION;
+import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.VALID_ID;
+import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.VALID_NAME;
+import static fr.apsprevoyance.skylift.constants.TestConstants.Sport.VALID_SEASON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,12 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
 import fr.apsprevoyance.skylift.constants.ValidationConstants;
 import fr.apsprevoyance.skylift.exception.ValidationException;
 
+@Tag("model")
 public class SportTest {
 
     private Sport.Builder builder;
