@@ -9,6 +9,7 @@ public final class AnnotationMessages {
         public static final String EMPTY = "ID cannot be empty";
         public static final String NULL = "ID cannot be null";
         public static final String NOT_NUMERIC = "ID must contain only digits";
+        public static final String POSITIVE = "ID must be positive";
     }
 
     public static final class Name {

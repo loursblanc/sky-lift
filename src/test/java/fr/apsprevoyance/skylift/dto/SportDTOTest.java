@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 
 import fr.apsprevoyance.skylift.constants.TestConstants;
 import fr.apsprevoyance.skylift.constants.ValidationConstants;
-import fr.apsprevoyance.skylift.dto.SportDTO;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -29,9 +28,8 @@ class SportDTOTest {
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-
         validDTO = new SportDTO();
-        validDTO.setId(TestConstants.Sport.VALID_ID);
+        validDTO.setId(123L);
         validDTO.setName(TestConstants.Sport.VALID_NAME);
         validDTO.setDescription(TestConstants.Sport.VALID_DESCRIPTION);
         validDTO.setActive(TestConstants.Sport.VALID_ACTIVE);
@@ -45,13 +43,38 @@ class SportDTOTest {
     }
 
     @Test
+    void sport_dto_with_null_id_has_validation_error() {
+        validDTO.setId(null);
+        Set<ConstraintViolation<SportDTO>> violations = validator.validate(validDTO);
+
+        assertFalse(violations.isEmpty(), TestConstants.ValidationTestMessages.ERROR_LIST_NOT_EMPTY);
+        assertEquals(1, violations.size(), TestConstants.ValidationTestMessages.ONE_ERROR_IN_EXCEPTION);
+        assertTrue(
+                violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals(TestConstants.FieldNames.ID)),
+                TestConstants.ValidationTestMessages.ERROR_FOR_ID);
+    }
+
+    @Test
+    void sport_dto_with_negative_id_has_validation_error() {
+        validDTO.setId(-1L);
+        Set<ConstraintViolation<SportDTO>> violations = validator.validate(validDTO);
+
+        assertFalse(violations.isEmpty(), TestConstants.ValidationTestMessages.ERROR_LIST_NOT_EMPTY);
+        assertEquals(1, violations.size(), TestConstants.ValidationTestMessages.ONE_ERROR_IN_EXCEPTION);
+        assertTrue(
+                violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals(TestConstants.FieldNames.ID)),
+                TestConstants.ValidationTestMessages.ERROR_FOR_ID);
+    }
+
+    @Test
     void sport_dto_with_empty_name_has_validation_error() {
         validDTO.setName("");
         Set<ConstraintViolation<SportDTO>> violations = validator.validate(validDTO);
 
         assertFalse(violations.isEmpty(), TestConstants.ValidationTestMessages.ERROR_LIST_NOT_EMPTY);
         assertEquals(3, violations.size(), TestConstants.ValidationTestMessages.THREE_ERROR_IN_EXCEPTION);
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("name")),
+        assertTrue(
+                violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals(TestConstants.FieldNames.NAME)),
                 TestConstants.ValidationTestMessages.ERROR_FOR_NAME);
     }
 
@@ -64,7 +87,8 @@ class SportDTOTest {
 
         assertFalse(violations.isEmpty(), TestConstants.ValidationTestMessages.ERROR_LIST_NOT_EMPTY);
         assertEquals(1, violations.size(), TestConstants.ValidationTestMessages.ONE_ERROR_IN_EXCEPTION);
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("name")),
+        assertTrue(
+                violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals(TestConstants.FieldNames.NAME)),
                 TestConstants.ValidationTestMessages.ERROR_FOR_NAME);
     }
 
@@ -80,7 +104,8 @@ class SportDTOTest {
 
         assertFalse(violations.isEmpty(), TestConstants.ValidationTestMessages.ERROR_LIST_NOT_EMPTY);
         assertEquals(1, violations.size(), TestConstants.ValidationTestMessages.ONE_ERROR_IN_EXCEPTION);
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("name")),
+        assertTrue(
+                violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals(TestConstants.FieldNames.NAME)),
                 TestConstants.ValidationTestMessages.ERROR_FOR_NAME);
     }
 
@@ -92,7 +117,8 @@ class SportDTOTest {
 
         assertFalse(violations.isEmpty(), TestConstants.ValidationTestMessages.ERROR_LIST_NOT_EMPTY);
         assertEquals(1, violations.size(), TestConstants.ValidationTestMessages.ONE_ERROR_IN_EXCEPTION);
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("name")),
+        assertTrue(
+                violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals(TestConstants.FieldNames.NAME)),
                 TestConstants.ValidationTestMessages.ERROR_FOR_NAME);
     }
 
@@ -104,12 +130,12 @@ class SportDTOTest {
 
         assertFalse(violations.isEmpty(), TestConstants.ValidationTestMessages.ERROR_LIST_NOT_EMPTY);
         assertEquals(1, violations.size(), TestConstants.ValidationTestMessages.ONE_ERROR_IN_EXCEPTION);
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("season")));
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals(TestConstants.FieldNames.SEASON)));
     }
 
     @Test
     void sport_dto_with_null_description_has_no_validation_error() {
-
         validDTO.setDescription(null);
 
         Set<ConstraintViolation<SportDTO>> violations = validator.validate(validDTO);
@@ -119,7 +145,6 @@ class SportDTOTest {
 
     @Test
     void sport_dto_description_is_never_null() {
-
         validDTO.setDescription(null);
 
         assertNotNull(validDTO.getDescription(), TestConstants.ValidationTestMessages.DTO_DESCRIPTION_NEVER_NULL);

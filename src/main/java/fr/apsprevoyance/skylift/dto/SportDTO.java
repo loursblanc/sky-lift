@@ -6,12 +6,14 @@ import fr.apsprevoyance.skylift.enums.Season;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 public class SportDTO {
 
-    @NotBlank(message = AnnotationMessages.Id.EMPTY)
-    private String id;
+    @NotNull(message = AnnotationMessages.Id.NULL)
+    @Positive(message = AnnotationMessages.Id.POSITIVE)
+    private Long id;
 
     @NotBlank(message = AnnotationMessages.Name.EMPTY)
     @Size(min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TEXT_LENGHT)
@@ -25,11 +27,11 @@ public class SportDTO {
     @NotNull(message = AnnotationMessages.Season.NULL)
     private Season season;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import fr.apsprevoyance.skylift.constants.AnnotationMessages;
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
 import fr.apsprevoyance.skylift.constants.TestConstants;
 import fr.apsprevoyance.skylift.constants.ValidationConstants;
@@ -20,13 +21,16 @@ import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.ValidationException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 @Tag("validation")
 class ModelValidationServiceTest {
 
     private ModelValidationService validationService;
+
+    private static final Long VALID_ID = 111L;
+    private static final Long INVALID_ID = -1L;
 
     @BeforeEach
     void setUp() {
@@ -35,8 +39,7 @@ class ModelValidationServiceTest {
 
     @Test
     void checkWithAnnotations_shouldReturnEmptyList_whenObjectIsValid() {
-        TestModel validModel = new TestModel(TestConstants.SKILIFT_VALID_ID, TestConstants.SKILIFT_VALID_NAME,
-                LocalDate.now());
+        TestModel validModel = new TestModel(123L, TestConstants.SKILIFT_VALID_NAME, LocalDate.now());
 
         List<String> errors = validationService.checkWithAnnotations(validModel);
 
@@ -51,32 +54,31 @@ class ModelValidationServiceTest {
 
         assertFalse(errors.isEmpty(), TestConstants.ValidationTestMessages.ERROR_LIST_NOT_EMPTY);
         assertEquals(3, errors.size(), TestConstants.ValidationTestMessages.THREE_ERROR_IN_EXCEPTION);
-        assertTrue(errors.stream().anyMatch(error -> error.contains("id")),
+        assertTrue(errors.stream().anyMatch(error -> error.contains(TestConstants.FieldNames.ID)),
                 TestConstants.ValidationTestMessages.ERROR_FOR_ID);
-        assertTrue(errors.stream().anyMatch(error -> error.contains("name")),
+        assertTrue(errors.stream().anyMatch(error -> error.contains(TestConstants.FieldNames.NAME)),
                 TestConstants.ValidationTestMessages.ERROR_FOR_NAME);
-        assertTrue(errors.stream().anyMatch(error -> error.contains("date")),
+        assertTrue(errors.stream().anyMatch(error -> error.contains(TestConstants.FieldNames.DATE)),
                 TestConstants.ValidationTestMessages.ERROR_FOR_DATE);
     }
 
     @Test
     void checkWithAnnotations_shouldReturnErrors_whenObjectHasInvalidValues() {
-        TestModel invalidModel = new TestModel(TestConstants.SkiLift.INVALID_ID_NON_NUMERIC, "", LocalDate.now());
+        TestModel invalidModel = new TestModel(INVALID_ID, "", LocalDate.now());
 
         List<String> errors = validationService.checkWithAnnotations(invalidModel);
 
         assertFalse(errors.isEmpty(), TestConstants.ValidationTestMessages.ERROR_LIST_NOT_EMPTY);
         assertEquals(3, errors.size(), TestConstants.ValidationTestMessages.THREE_ERROR_IN_EXCEPTION);
-        assertTrue(errors.stream().anyMatch(error -> error.contains("id")),
+        assertTrue(errors.stream().anyMatch(error -> error.contains(TestConstants.FieldNames.ID)),
                 TestConstants.ValidationTestMessages.ERROR_FOR_ID);
-        assertTrue(errors.stream().anyMatch(error -> error.contains("name")),
+        assertTrue(errors.stream().anyMatch(error -> error.contains(TestConstants.FieldNames.NAME)),
                 TestConstants.ValidationTestMessages.ERROR_FOR_NAME);
     }
 
     @Test
     void checkAndThrowIfInvalid_shouldNotThrowException_whenObjectIsValid() {
-        TestModel validModel = new TestModel(TestConstants.SKILIFT_VALID_ID, TestConstants.SKILIFT_VALID_NAME,
-                LocalDate.now());
+        TestModel validModel = new TestModel(123L, TestConstants.SKILIFT_VALID_NAME, LocalDate.now());
 
         assertDoesNotThrow(() -> validationService.checkAndThrowIfInvalid(validModel, "TestModel"),
                 TestConstants.ValidationTestMessages.NO_EXCEPTION_FOR_VALID);
@@ -84,7 +86,7 @@ class ModelValidationServiceTest {
 
     @Test
     void checkAndThrowIfInvalid_shouldThrowException_whenObjectIsInvalid() {
-        TestModel invalidModel = new TestModel(TestConstants.SkiLift.INVALID_ID_NON_NUMERIC, "", null);
+        TestModel invalidModel = new TestModel(INVALID_ID, "", null);
 
         ValidationException exception = assertThrows(ValidationException.class,
                 () -> validationService.checkAndThrowIfInvalid(invalidModel, "TestModel"),
@@ -99,11 +101,9 @@ class ModelValidationServiceTest {
 
     @Test
     void checkAndThrowIfInvalid_withCustomValidator_shouldNotThrowException_whenAllValidationsPass() {
-        TestModel validModel = new TestModel(TestConstants.SKILIFT_VALID_ID, TestConstants.SKILIFT_VALID_NAME,
-                LocalDate.now());
+        TestModel validModel = new TestModel(VALID_ID, TestConstants.SKILIFT_VALID_NAME, LocalDate.now());
 
         CustomValidator<TestModel> customValidator = (model, errors) -> {
-
         };
 
         assertDoesNotThrow(() -> validationService.checkAndThrowIfInvalid(validModel, "TestModel", customValidator),
@@ -112,7 +112,7 @@ class ModelValidationServiceTest {
 
     @Test
     void checkAndThrowIfInvalid_withCustomValidator_shouldThrowException_whenCustomValidationFails() {
-        TestModel validModel = new TestModel("123", "Valid name", TestConstants.SkiLift.INVALID_DATE_TOO_OLD);
+        TestModel validModel = new TestModel(VALID_ID, "Valid name", TestConstants.SkiLift.INVALID_DATE_TOO_OLD);
 
         CustomValidator<TestModel> customValidator = (model, errors) -> {
             if (model.getDate().isBefore(ValidationConstants.FIRST_SKILIFT_DATE)) {
@@ -132,8 +132,7 @@ class ModelValidationServiceTest {
 
     @Test
     void checkAndThrowIfInvalid_withCustomValidator_shouldIncludeAllErrors_whenBothValidationsFail() {
-        TestModel invalidModel = new TestModel(TestConstants.SkiLift.INVALID_ID_NON_NUMERIC, "",
-                TestConstants.SkiLift.INVALID_DATE_TOO_OLD);
+        TestModel invalidModel = new TestModel(INVALID_ID, "", TestConstants.SkiLift.INVALID_DATE_TOO_OLD);
 
         CustomValidator<TestModel> customValidator = (model, errors) -> {
             if (model.getDate().isBefore(ValidationConstants.FIRST_SKILIFT_DATE)) {
@@ -151,25 +150,42 @@ class ModelValidationServiceTest {
                 TestConstants.ValidationTestMessages.DATE_TOO_OLD_ERROR_PRESENT);
     }
 
+    @Test
+    void checkWithAnnotations_shouldReturnErrors_whenNameIsTooLong() {
+        StringBuilder longName = new StringBuilder();
+        for (int i = 0; i < ValidationConstants.NAME_MAX_LENGTH + 10; i++) {
+            longName.append("a");
+        }
+
+        TestModel invalidModel = new TestModel(VALID_ID, longName.toString(), LocalDate.now());
+
+        List<String> errors = validationService.checkWithAnnotations(invalidModel);
+
+        assertFalse(errors.isEmpty(), TestConstants.ValidationTestMessages.ERROR_LIST_NOT_EMPTY);
+        assertEquals(1, errors.size(), TestConstants.ValidationTestMessages.ONE_ERROR_IN_EXCEPTION);
+        assertTrue(errors.stream().anyMatch(error -> error.contains(TestConstants.FieldNames.NAME)),
+                TestConstants.ValidationTestMessages.ERROR_FOR_NAME);
+    }
+
     private static class TestModel {
-        @NotBlank(message = TestConstants.ValidationTestMessages.ID_CANNOT_BE_EMPTY)
-        @Pattern(regexp = ValidationConstants.REGEX_NUMERIC, message = TestConstants.ValidationTestMessages.ID_MUST_BE_NUMERIC)
-        private final String id;
+        @NotNull(message = AnnotationMessages.Id.NULL)
+        @Positive(message = AnnotationMessages.Id.POSITIVE)
+        private final Long id;
 
         @NotBlank(message = TestConstants.ValidationTestMessages.NAME_CANNOT_BE_EMPTY)
-        @Size(min = ValidationConstants.NAME_MIN_LENGTH, message = TestConstants.ValidationTestMessages.NAME_MIN_LENGTH)
+        @Size(min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TEXT_LENGHT)
         private final String name;
 
         @NotNull(message = TestConstants.ValidationTestMessages.DATE_CANNOT_BE_NULL)
         private final LocalDate date;
 
-        public TestModel(String id, String name, LocalDate date) {
+        public TestModel(Long id, String name, LocalDate date) {
             this.id = id;
             this.name = name;
             this.date = date;
         }
 
-        public String getId() {
+        public Long getId() {
             return id;
         }
 

@@ -17,12 +17,13 @@ import jakarta.annotation.Generated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 public class Sport {
-    @NotBlank(message = AnnotationMessages.Id.EMPTY)
-    @Pattern(regexp = ValidationConstants.REGEX_NUMERIC, message = AnnotationMessages.Id.NOT_NUMERIC)
-    private final String id;
+    @NotNull(message = AnnotationMessages.Id.NULL)
+    @Positive(message = AnnotationMessages.Id.POSITIVE)
+    private final Long id;
 
     @NotBlank(message = AnnotationMessages.Name.EMPTY)
     @Size(min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TEXT_LENGHT)
@@ -53,7 +54,7 @@ public class Sport {
 
         private static final Logger log = LoggerFactory.getLogger(Sport.Builder.class);
 
-        private String id;
+        private Long id;
         private String name;
         private String description;
         private boolean active = true;
@@ -62,7 +63,7 @@ public class Sport {
         private Builder() {
         }
 
-        public Builder id(String id) {
+        public Builder id(Long id) {
             this.id = id;
             return this;
         }
@@ -120,7 +121,7 @@ public class Sport {
         }
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

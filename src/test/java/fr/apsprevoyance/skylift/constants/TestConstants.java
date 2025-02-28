@@ -14,9 +14,9 @@ public final class TestConstants {
     private TestConstants() {
     }
 
-    public static final String SPORT_VALID_ID = "111";
+    public static final Long SPORT_VALID_ID = 111L;
     public static final String SPORT_VALID_DESCRIPTION = "Alpine skiing";
-    public static final String SPORT_DIFFERENT_ID = "456";
+    public static final Long SPORT_DIFFERENT_ID = 456L;
     public static final String SPORT_DIFFERENT_DESCRIPTION = "Snowboard freestyle";
 
     public static final String SKILIFT_VALID_ID = "789";
@@ -34,16 +34,18 @@ public final class TestConstants {
         public static final String COMMENT = "comment";
         public static final String AVAILABLE_SPORTS = "availableSports";
         public static final String COMMISSIONING_DATE = "commissioningDate";
+        public static final String DATE = "date";
+        public static final Object SEASON = "season";
     }
 
     public static final class Sport {
-        public static final String VALID_ID = SPORT_VALID_ID;
+        public static final Long VALID_ID = SPORT_VALID_ID;
         public static final String VALID_NAME = AllowedSportType.SKI.getLabel();
         public static final String VALID_DESCRIPTION = SPORT_VALID_DESCRIPTION;
         public static final boolean VALID_ACTIVE = true;
         public static final Season VALID_SEASON = Season.WINTER;
 
-        public static final String DIFFERENT_ID = SPORT_DIFFERENT_ID;
+        public static final Long DIFFERENT_ID = SPORT_DIFFERENT_ID;
         public static final String DIFFERENT_NAME = AllowedSportType.SNOWBOARD.getLabel();
         public static final String DIFFERENT_DESCRIPTION = SPORT_DIFFERENT_DESCRIPTION;
 
