@@ -9,6 +9,7 @@ public final class ValidationConstants {
 
     public static final int NAME_MIN_LENGTH = 3;
     public static final int NAME_MAX_LENGTH = 50;
+    public static final int DESCRIPTION_MAX_LENGTH = 1000;
 
     public static final LocalDate FIRST_SKILIFT_DATE = LocalDate.of(1934, 12, 23);
 

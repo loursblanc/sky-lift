@@ -15,13 +15,17 @@ public final class AnnotationMessages {
     public static final class Name {
         public static final String EMPTY = "Name cannot be empty";
         public static final String NULL = "Name cannot be null";
-        public static final String TEXT_LENGHT = "Le nom doit contenir entre {min} et {max} caractères";
+        public static final String TEXT_LENGHT = "The name must contain between {min} and {max} characters.";
 
         public static final String INVALID_CHARS = "Name can only contain letters, numbers, spaces, and apostrophes";
     }
 
     public static final class Description {
-        public static final String NULL = "Season cannot be null";
+        public static final String TOO_LENGHT = "the description must not contain more than {max} characters ";
+    }
+
+    public static final class Comment {
+        public static final String TOO_LENGHT = "the comment must not contain more than {max} characters";
     }
 
     public static final class Season {

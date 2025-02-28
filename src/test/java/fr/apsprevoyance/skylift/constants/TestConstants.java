@@ -36,6 +36,7 @@ public final class TestConstants {
         public static final String COMMISSIONING_DATE = "commissioningDate";
         public static final String DATE = "date";
         public static final Object SEASON = "season";
+        public static final Object DESCRIPTION = "description";
     }
 
     public static final class Sport {
@@ -136,6 +137,8 @@ public final class TestConstants {
         public static final String DATE_TOO_OLD_ERROR = "The date should not be before the first ski lift";
         public static final String SPORTS_NEVER_NULL = "Available sports should never be null";
         public static final String COMMENT_REPLACE_BLANK = "The comment should be an empty string when set to null";
+        public static final String ERROR_FOR_DESCRIPTION = "the text must not contain more than 1000 characters ";
+        public static final String ERROR_FOR_COMMENT = "the text must not contain more than 1000 characters";
 
         private ValidationTestMessages() {
         }
