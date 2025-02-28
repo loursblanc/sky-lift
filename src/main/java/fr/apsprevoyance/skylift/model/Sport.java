@@ -1,18 +1,15 @@
 package fr.apsprevoyance.skylift.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.apsprevoyance.skylift.constants.AnnotationMessages;
-import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
 import fr.apsprevoyance.skylift.constants.ValidationConstants;
 import fr.apsprevoyance.skylift.enums.Season;
-import fr.apsprevoyance.skylift.enums.ValidationContextType;
-import fr.apsprevoyance.skylift.exception.ValidationException;
+import fr.apsprevoyance.skylift.validation.OnCreate;
+import fr.apsprevoyance.skylift.validation.OnUpdate;
 import jakarta.annotation.Generated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,18 +18,18 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 public class Sport {
-    @NotNull(message = AnnotationMessages.Id.NULL)
-    @Positive(message = AnnotationMessages.Id.POSITIVE)
-    private final Long id;
 
-    @NotBlank(message = AnnotationMessages.Name.EMPTY)
+    @NotNull(groups = OnUpdate.class, message = AnnotationMessages.Id.NULL)
+    @Positive(message = AnnotationMessages.Id.POSITIVE)
+    private Long id;
+
+    @NotBlank(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Name.EMPTY)
     @Size(min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TEXT_LENGHT)
     @Pattern(regexp = ValidationConstants.REGEX_NAME_VALID_CHARS, message = AnnotationMessages.Name.INVALID_CHARS)
     private final String name;
     private final String description;
     private final boolean active;
-
-    @NotNull(message = AnnotationMessages.Season.NULL)
+    @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Season.NULL)
     private final Season season;
 
     @Generated("SparkTools")
@@ -69,7 +66,7 @@ public class Sport {
         }
 
         public Builder name(String name) {
-            this.name = name;
+            this.name = name != null ? name : "";
             return this;
         }
 
@@ -89,35 +86,7 @@ public class Sport {
         }
 
         public Sport build() {
-
-            List<String> errors = collectValidationErrors();
-
-            if (!errors.isEmpty()) {
-                log.warn(ErrorMessageConstants.Logs.VALIDATION_FAILED, SkiLift.class.getSimpleName(),
-                        SkiLift.class.getPackage().getName(), String.join(", ", errors));
-
-                throw new ValidationException(SkiLift.class.getSimpleName(), ValidationContextType.MODEL, errors);
-            }
-
             return new Sport(this);
-        }
-
-        private List<String> collectValidationErrors() {
-
-            List<String> errors = new ArrayList<String>();
-
-            if (id == null) {
-                errors.add(ErrorMessageConstants.Errors.ID_NULL);
-            }
-
-            if (name == null) {
-                errors.add(ErrorMessageConstants.Errors.NAME_NULL);
-            }
-
-            if (season == null) {
-                errors.add(ErrorMessageConstants.Errors.SEASON_NULL);
-            }
-            return errors;
         }
     }
 

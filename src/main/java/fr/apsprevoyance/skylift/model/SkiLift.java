@@ -11,18 +11,22 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.apsprevoyance.skylift.constants.AnnotationMessages;
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.ValidationException;
+import fr.apsprevoyance.skylift.validation.OnCreate;
 import jakarta.annotation.Generated;
 import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class SkiLift {
 
-    @NotNull
+    @NotNull(groups = OnCreate.class, message = AnnotationMessages.Id.NULL)
+    @Positive(message = AnnotationMessages.Id.POSITIVE)
     private final String id;
 
     @NotNull
