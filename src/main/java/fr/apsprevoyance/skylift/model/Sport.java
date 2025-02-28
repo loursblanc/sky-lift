@@ -27,6 +27,7 @@ public class Sport {
     @Size(min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TEXT_LENGHT)
     @Pattern(regexp = ValidationConstants.REGEX_NAME_VALID_CHARS, message = AnnotationMessages.Name.INVALID_CHARS)
     private final String name;
+    @Size(max = ValidationConstants.DESCRIPTION_MAX_LENGTH, message = AnnotationMessages.Description.TOO_LENGHT)
     private final String description;
     private final boolean active;
     @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Season.NULL)

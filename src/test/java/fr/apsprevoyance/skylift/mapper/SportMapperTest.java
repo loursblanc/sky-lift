@@ -2,100 +2,124 @@ package fr.apsprevoyance.skylift.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import fr.apsprevoyance.skylift.constants.TestConstants;
-import fr.apsprevoyance.skylift.dto.SportCreateDTO;
 import fr.apsprevoyance.skylift.dto.SportDTO;
 import fr.apsprevoyance.skylift.model.Sport;
 
+@Tag("mapper")
 class SportMapperTest {
 
-    private final SportMapper sportMapper = new SportMapper() {
-        @Override
-        public SportDTO toDto(Sport sport) {
-            if (sport == null) {
-                return null;
-            }
+    private SportMapper mapper;
+    private SportDTO validDto;
 
-            SportDTO dto = new SportDTO();
-            dto.setId(sport.getId());
-            dto.setName(sport.getName());
-            dto.setDescription(sport.getDescription());
-            dto.setActive(sport.isActive());
-            dto.setSeason(sport.getSeason());
-            return dto;
-        }
+    @BeforeEach
+    void setUp() {
+        mapper = Mappers.getMapper(SportMapper.class);
 
-        @Override
-        public Sport toEntity(SportDTO dto) {
-            if (dto == null) {
-                return null;
-            }
-
-            return Sport.builder().id(dto.getId()).name(dto.getName()).description(dto.getDescription())
-                    .active(dto.isActive()).season(dto.getSeason()).build();
-        }
-
-        @Override
-        public Sport toEntity(SportCreateDTO createDto) {
-            if (createDto == null) {
-                return null;
-            }
-
-            return Sport.builder().name(createDto.getName()).description(createDto.getDescription())
-                    .active(createDto.isActive()).season(createDto.getSeason()).build();
-        }
-    };
+        validDto = new SportDTO();
+        validDto.setId(TestConstants.Sport.VALID_ID);
+        validDto.setName(TestConstants.Sport.VALID_NAME);
+        validDto.setDescription(TestConstants.Sport.VALID_DESCRIPTION);
+        validDto.setActive(TestConstants.Sport.VALID_ACTIVE);
+        validDto.setSeason(TestConstants.Sport.VALID_SEASON);
+    }
 
     @Test
-    void toDto_shouldMapAllFields() {
-        Sport sport = Sport.builder().id(TestConstants.Sport.VALID_ID).name(TestConstants.Sport.VALID_NAME)
+    void toEntityForCreate_should_map_dto_to_entity_ignoring_id() {
+        Sport result = mapper.toEntityForCreate(validDto);
+
+        assertNotNull(result);
+        assertNull(result.getId());
+        assertEquals(validDto.getName(), result.getName());
+        assertEquals(validDto.getDescription(), result.getDescription());
+        assertEquals(validDto.isActive(), result.isActive());
+        assertEquals(validDto.getSeason(), result.getSeason());
+    }
+
+    @Test
+    void toEntityForCreate_should_handle_null_description() {
+        validDto.setDescription(null);
+
+        Sport result = mapper.toEntityForCreate(validDto);
+
+        assertNotNull(result);
+        assertEquals("", result.getDescription());
+    }
+
+    @Test
+    void toEntityForUpdate_should_map_dto_to_entity_with_id() {
+        Sport result = mapper.toEntityForUpdate(validDto);
+
+        assertNotNull(result);
+        assertEquals(validDto.getId(), result.getId());
+        assertEquals(validDto.getName(), result.getName());
+        assertEquals(validDto.getDescription(), result.getDescription());
+        assertEquals(validDto.isActive(), result.isActive());
+        assertEquals(validDto.getSeason(), result.getSeason());
+    }
+
+    @Test
+    void toDto_should_map_entity_to_dto() {
+        Sport entity = Sport.builder().id(TestConstants.Sport.VALID_ID).name(TestConstants.Sport.VALID_NAME)
                 .description(TestConstants.Sport.VALID_DESCRIPTION).active(TestConstants.Sport.VALID_ACTIVE)
                 .season(TestConstants.Sport.VALID_SEASON).build();
 
-        SportDTO dto = sportMapper.toDto(sport);
+        SportDTO result = mapper.toDto(entity);
 
-        assertEquals(TestConstants.Sport.VALID_ID, dto.getId());
-        assertEquals(TestConstants.Sport.VALID_NAME, dto.getName());
-        assertEquals(TestConstants.Sport.VALID_DESCRIPTION, dto.getDescription());
-        assertEquals(TestConstants.Sport.VALID_ACTIVE, dto.isActive());
-        assertEquals(TestConstants.Sport.VALID_SEASON, dto.getSeason());
+        assertNotNull(result);
+        assertEquals(entity.getId(), result.getId());
+        assertEquals(entity.getName(), result.getName());
+        assertEquals(entity.getDescription(), result.getDescription());
+        assertEquals(entity.isActive(), result.isActive());
+        assertEquals(entity.getSeason(), result.getSeason());
     }
 
     @Test
-    void toEntity_fromDto_shouldMapAllFields() {
-        SportDTO dto = new SportDTO();
-        dto.setId(TestConstants.Sport.VALID_ID);
-        dto.setName(TestConstants.Sport.VALID_NAME);
-        dto.setDescription(TestConstants.Sport.VALID_DESCRIPTION);
-        dto.setActive(TestConstants.Sport.VALID_ACTIVE);
-        dto.setSeason(TestConstants.Sport.VALID_SEASON);
+    void dtoToBuilderForCreate_should_return_builder_without_id() {
+        Sport.Builder builder = mapper.dtoToBuilderForCreate(validDto);
 
-        Sport entity = sportMapper.toEntity(dto);
+        Sport result = builder.build();
 
-        assertEquals(TestConstants.Sport.VALID_ID, entity.getId());
-        assertEquals(TestConstants.Sport.VALID_NAME, entity.getName());
-        assertEquals(TestConstants.Sport.VALID_DESCRIPTION, entity.getDescription());
-        assertEquals(TestConstants.Sport.VALID_ACTIVE, entity.isActive());
-        assertEquals(TestConstants.Sport.VALID_SEASON, entity.getSeason());
+        assertNotNull(result);
+        assertNull(result.getId());
+        assertEquals(validDto.getName(), result.getName());
+        assertEquals(validDto.getDescription(), result.getDescription());
+        assertEquals(validDto.isActive(), result.isActive());
+        assertEquals(validDto.getSeason(), result.getSeason());
     }
 
     @Test
-    void toEntity_fromCreateDto_shouldMapAllFieldsExceptId() {
-        SportCreateDTO createDto = new SportCreateDTO();
-        createDto.setName(TestConstants.Sport.VALID_NAME);
-        createDto.setDescription(TestConstants.Sport.VALID_DESCRIPTION);
-        createDto.setActive(TestConstants.Sport.VALID_ACTIVE);
-        createDto.setSeason(TestConstants.Sport.VALID_SEASON);
+    void dtoToBuilderForCreate_should_handle_null_dto() {
+        Sport.Builder builder = mapper.dtoToBuilderForCreate(null);
 
-        Sport entity = sportMapper.toEntity(createDto);
+        assertNotNull(builder);
+    }
 
-        assertNotNull(entity);
-        assertEquals(TestConstants.Sport.VALID_NAME, entity.getName());
-        assertEquals(TestConstants.Sport.VALID_DESCRIPTION, entity.getDescription());
-        assertEquals(TestConstants.Sport.VALID_ACTIVE, entity.isActive());
-        assertEquals(TestConstants.Sport.VALID_SEASON, entity.getSeason());
+    @Test
+    void dtoToBuilderForUpdate_should_return_builder_with_id() {
+        Sport.Builder builder = mapper.dtoToBuilderForUpdate(validDto);
+
+        Sport result = builder.build();
+
+        assertNotNull(result);
+        assertEquals(validDto.getId(), result.getId());
+        assertEquals(validDto.getName(), result.getName());
+        assertEquals(validDto.getDescription(), result.getDescription());
+        assertEquals(validDto.isActive(), result.isActive());
+        assertEquals(validDto.getSeason(), result.getSeason());
+    }
+
+    @Test
+    void dtoToBuilderForUpdate_should_handle_null_dto() {
+        Sport.Builder builder = mapper.dtoToBuilderForUpdate(null);
+
+        assertNotNull(builder);
     }
 }
