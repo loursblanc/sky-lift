@@ -11,6 +11,7 @@ import fr.apsprevoyance.skylift.mapper.SportMapper;
 import fr.apsprevoyance.skylift.model.Sport;
 import fr.apsprevoyance.skylift.repository.SportRepository;
 import fr.apsprevoyance.skylift.validation.ModelValidationService;
+import fr.apsprevoyance.skylift.validation.OnCreate;
 
 @Service
 public class SportServiceImpl implements SportService {
@@ -31,7 +32,7 @@ public class SportServiceImpl implements SportService {
         Objects.requireNonNull(sportDTO, "SportDTO cannot be null");
 
         Sport sport = sportMapper.toEntityForCreate(sportDTO);
-        modelValidationService.checkAndThrowIfInvalid(sport, "Sport");
+        modelValidationService.checkAndThrowIfInvalid(sport, "Sport", OnCreate.class);
 
         Sport createdSport = sportRepository.create(sport);
 
