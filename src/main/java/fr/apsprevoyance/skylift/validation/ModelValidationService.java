@@ -15,6 +15,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import jakarta.validation.groups.Default;
 
 @Service
 public class ModelValidationService {
@@ -27,28 +28,20 @@ public class ModelValidationService {
         this.validator = factory.getValidator();
     }
 
-    public <T> List<String> checkWithAnnotations(T object) {
-        Set<ConstraintViolation<T>> violations = validator.validate(object);
+    public <T> List<String> checkWithAnnotations(T object, Class<?>... groups) {
+
+        if (groups == null || groups.length == 0) {
+            groups = new Class<?>[] { Default.class };
+        }
+
+        Set<ConstraintViolation<T>> violations = validator.validate(object, groups);
 
         return violations.stream().map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.toList());
     }
 
-    public <T> void checkAndThrowIfInvalid(T object, String entityName) {
-        List<String> errors = checkWithAnnotations(object);
-
-        if (!errors.isEmpty()) {
-            log.warn(ErrorMessageConstants.Logs.VALIDATION_FAILED, entityName, object.getClass().getPackage().getName(),
-                    String.join(", ", errors));
-
-            throw new ValidationException(entityName, ValidationContextType.MODEL, errors);
-        }
-    }
-
-    public <T> void checkAndThrowIfInvalid(T object, String entityName, CustomValidator<T> customValidator) {
-        List<String> errors = checkWithAnnotations(object);
-
-        customValidator.validate(object, errors);
+    public <T> void checkAndThrowIfInvalid(T object, String entityName, Class<?>... groups) {
+        List<String> errors = checkWithAnnotations(object, groups);
 
         if (!errors.isEmpty()) {
             log.warn(ErrorMessageConstants.Logs.VALIDATION_FAILED, entityName, object.getClass().getPackage().getName(),

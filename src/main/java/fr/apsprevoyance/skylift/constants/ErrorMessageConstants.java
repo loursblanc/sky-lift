@@ -25,6 +25,13 @@ public final class ErrorMessageConstants {
         public static final String PREFIX_BUSINESS = "Business rule error";
         public static final String PREFIX_PERSISTENCE = "Persistence error";
 
+        public static final String REQUEST_PARSING_ERROR = "Failed to parse request body";
+        public static final String JSON_PARSE_ERROR_SAFE = "Invalid JSON format at line %d, column %d";
+        public static final String JSON_MAPPING_ERROR_SAFE = "Invalid data format in request";
+        public static final String JSON_UNKNOWN_PROPERTY_SAFE = "Unknown field: %s";
+
+        public static final String ENTITY_NOT_FOUND_SAFE = "The requested %s with identifier %s was not found";
+        public static final String DUPLICATE_ENTITY_SAFE = "A %s with these details already exists";
     }
 
     public static final class Fields {
@@ -84,5 +91,8 @@ public final class ErrorMessageConstants {
         public static final String METHOD_ARGS_VALIDATION_FAILED = "Method argument validation failed: {}";
         public static final String UNCAUGHT_EXCEPTION = "Uncaught exception: ";
         public static final String INVALID_OBJECT_BUILD = "Attempting to build invalid {} object in package {}: {}";
+        public static final String REQUEST_PARSING_FAILED = "Request parsing failed: {}";
+        public static final String ENTITY_NOT_FOUND = "Entity {} with identifier {} not found";
+        public static final String DUPLICATE_ENTITY = "Duplicate entity {} with {}={}";
     }
 }
