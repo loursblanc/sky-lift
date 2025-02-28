@@ -17,12 +17,14 @@ public final class ErrorMessageConstants {
         public static final String FIELD_INVALID_CHARS = "%s can only contain letters (including accented characters), digits, spaces, and apostrophes";
         public static final String FIELD_NOT_NUMERIC = "%s must contain only digits";
         public static final String FIELD_TOO_OLD = "%S is too old to be valid";
+        public static final String FIELD_PREDEFINED = "Cannot create a %s with predefined %s";
 
         public static final String PREFIX_DEFAULT = "Validation error";
         public static final String PREFIX_MODEL = "Model validation error";
         public static final String PREFIX_REQUEST = "Request validation error";
         public static final String PREFIX_BUSINESS = "Business rule error";
         public static final String PREFIX_PERSISTENCE = "Persistence error";
+
     }
 
     public static final class Fields {
@@ -37,25 +39,34 @@ public final class ErrorMessageConstants {
 
     public static final class Errors {
         public static final String ID_NULL = String.format(Validation.FIELD_NULL, Fields.ID);
-        public static final String NAME_NULL = String.format(Validation.FIELD_NULL, Fields.NAME);
-        public static final String SEASON_NULL = String.format(Validation.FIELD_NULL, Fields.SEASON);
         public static final String ID_EMPTY = String.format(Validation.FIELD_EMPTY, Fields.ID);
+        public static final String ID_NOT_NUMERIC = String.format(Validation.FIELD_NOT_NUMERIC, Fields.ID);
+
+        public static final String NAME_NULL = String.format(Validation.FIELD_NULL, Fields.NAME);
         public static final String NAME_EMPTY = String.format(Validation.FIELD_EMPTY, Fields.NAME);
         public static final String NAME_TOO_LONG = String.format(Validation.FIELD_MAX_LENGTH, Fields.NAME,
                 ValidationConstants.NAME_MAX_LENGTH);
         public static final String NAME_TOO_SHORT = String.format(Validation.FIELD_MIN_LENGTH, Fields.NAME,
                 ValidationConstants.NAME_MIN_LENGTH);
         public static final String NAME_INVALID_CHARS = String.format(Validation.FIELD_INVALID_CHARS, Fields.NAME);
-        public static final String ID_NOT_NUMERIC = String.format(Validation.FIELD_NOT_NUMERIC, Fields.ID);
+
+        public static final String SEASON_NULL = String.format(Validation.FIELD_NULL, Fields.SEASON);
+
         public static final String TYPE_NULL = String.format(Validation.FIELD_NULL, Fields.TYPE);;
+
         public static final String AVAILABLE_SPORTS_NULL = String.format(Validation.FIELD_NULL, Fields.SPORT);;
         public static final String AVAILABLE_SPORTS_EMPTY = String.format(Validation.FIELD_EMPTY, Fields.SPORT);;
+
         public static final String COMMISSIONING_DATE_NULL = String.format(Validation.FIELD_NULL,
                 Fields.COMMISSIONING_DATE);
         public static final String COMMISSIONING_DATE_TOO_OLD = String.format(Validation.FIELD_TOO_OLD,
                 Fields.COMMISSIONING_DATE);
 
         public static final String STATUS_NULL = String.format(Validation.FIELD_NULL, Fields.STATUS);
+
+        public static final String SPORT_NULL = String.format(Validation.FIELD_NULL, Fields.SPORT);
+        public static final String SPORT_ID_PREDEFINED = String.format(Validation.FIELD_PREDEFINED, Fields.SPORT,
+                Fields.ID);
 
     }
 
