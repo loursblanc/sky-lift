@@ -20,7 +20,7 @@ import fr.apsprevoyance.skylift.repository.SportRepository;
 import fr.apsprevoyance.skylift.validation.ModelValidationService;
 
 @Tag("repository")
-class SportServiceTest {
+class SportServiceImplTest {
 
     private static class SportRepositoryInMemory implements SportRepository {
         private final List<Sport> sports = new ArrayList<>();
@@ -81,13 +81,13 @@ class SportServiceTest {
 
         private SportRepository sportRepository;
         private ModelValidationService modelValidationService;
-        private SportService sportService;
+        private SportServiceImpl sportService;
 
         @BeforeEach
         void setUp() {
             sportRepository = new SportRepositoryInMemory();
             modelValidationService = new ModelValidationService();
-            sportService = new SportService(sportRepository, sportMapper, modelValidationService);
+            sportService = new SportServiceImpl(sportRepository, sportMapper, modelValidationService);
         }
 
         @Test
