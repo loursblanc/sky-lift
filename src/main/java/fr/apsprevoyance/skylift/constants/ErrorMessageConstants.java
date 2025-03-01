@@ -47,6 +47,7 @@ public final class ErrorMessageConstants {
         public static final String ID_NULL = String.format(Validation.FIELD_NULL, Fields.ID);
         public static final String ID_EMPTY = String.format(Validation.FIELD_EMPTY, Fields.ID);
         public static final String ID_NOT_NUMERIC = String.format(Validation.FIELD_NOT_NUMERIC, Fields.ID);
+        public static final String ID_INVALID = String.format(Validation.FIELD_INVALID_FORMAT, Fields.ID);
 
         public static final String NAME_NULL = String.format(Validation.FIELD_NULL, Fields.NAME);
         public static final String NAME_EMPTY = String.format(Validation.FIELD_EMPTY, Fields.NAME);

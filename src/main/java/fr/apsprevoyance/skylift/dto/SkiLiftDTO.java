@@ -8,43 +8,52 @@ import fr.apsprevoyance.skylift.constants.AnnotationMessages;
 import fr.apsprevoyance.skylift.constants.ValidationConstants;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
+import fr.apsprevoyance.skylift.validation.OnCreate;
+import fr.apsprevoyance.skylift.validation.OnUpdate;
 import fr.apsprevoyance.skylift.validation.ValidSkiLiftDate;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.groups.Default;
 
 public class SkiLiftDTO {
 
-    @NotBlank(message = AnnotationMessages.Id.EMPTY)
-    private String id;
+    @NotNull(groups = OnUpdate.class, message = AnnotationMessages.Id.NULL)
+    @Positive(groups = { OnUpdate.class, OnCreate.class, Default.class }, message = AnnotationMessages.Id.POSITIVE)
+    private Long id;
 
-    @NotBlank(message = AnnotationMessages.Name.EMPTY)
-    @Size(min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TEXT_LENGHT)
-    @Pattern(regexp = ValidationConstants.REGEX_NAME_VALID_CHARS, message = AnnotationMessages.Name.INVALID_CHARS)
+    @NotBlank(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Name.EMPTY)
+    @Size(groups = { OnUpdate.class, OnCreate.class,
+            Default.class }, min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TEXT_LENGHT)
+    @Pattern(groups = { OnUpdate.class, OnCreate.class,
+            Default.class }, regexp = ValidationConstants.REGEX_NAME_VALID_CHARS, message = AnnotationMessages.Name.INVALID_CHARS)
     private String name;
 
-    @NotNull(message = AnnotationMessages.Type.NULL)
+    @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Type.NULL)
     private SkiLiftType type;
 
-    @NotNull(message = AnnotationMessages.Generic.REQUIRED)
+    @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Generic.REQUIRED)
     private SkiLiftStatus status;
 
+    @Size(groups = { OnUpdate.class, OnCreate.class,
+            Default.class }, max = ValidationConstants.DESCRIPTION_MAX_LENGTH, message = AnnotationMessages.Description.TOO_LENGHT)
     private String comment;
 
-    @NotEmpty(message = AnnotationMessages.Generic.REQUIRED)
+    @NotEmpty(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Generic.REQUIRED)
     private Set<String> availableSports = new HashSet<>();
 
-    @NotNull(message = AnnotationMessages.Date.NULL)
-    @ValidSkiLiftDate
+    @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Date.NULL)
+    @ValidSkiLiftDate(groups = { OnUpdate.class, OnCreate.class, Default.class })
     private LocalDate commissioningDate;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -1,10 +1,8 @@
 package fr.apsprevoyance.skylift.model;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -12,22 +10,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.apsprevoyance.skylift.constants.AnnotationMessages;
-import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
-import fr.apsprevoyance.skylift.enums.ValidationContextType;
-import fr.apsprevoyance.skylift.exception.ValidationException;
 import fr.apsprevoyance.skylift.validation.OnCreate;
+import fr.apsprevoyance.skylift.validation.OnUpdate;
 import jakarta.annotation.Generated;
 import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.groups.Default;
 
 public class SkiLift {
 
-    @NotNull(groups = OnCreate.class, message = AnnotationMessages.Id.NULL)
-    @Positive(message = AnnotationMessages.Id.POSITIVE)
-    private final String id;
+    @NotNull(groups = { OnCreate.class, OnUpdate.class }, message = AnnotationMessages.Id.NULL)
+    @Positive(groups = { OnCreate.class, OnUpdate.class, Default.class }, message = AnnotationMessages.Id.POSITIVE)
+    private final Long id;
 
     @NotNull
     private final String name;
@@ -66,7 +63,7 @@ public class SkiLift {
     public static final class Builder {
         private static final Logger log = LoggerFactory.getLogger(Builder.class);
 
-        private String id;
+        private Long id;
         private String name;
         private SkiLiftType type;
         private SkiLiftStatus status;
@@ -77,7 +74,7 @@ public class SkiLift {
         private Builder() {
         }
 
-        public Builder id(@Nonnull String id) {
+        public Builder id(@Nonnull Long id) {
             this.id = id;
             return this;
         }
@@ -103,11 +100,7 @@ public class SkiLift {
         }
 
         public Builder availableSports(Set<String> availableSports) {
-            if (availableSports == null) {
-                this.availableSports = null;
-            } else {
-                this.availableSports = new HashSet<>(availableSports);
-            }
+            this.availableSports = availableSports == null ? new HashSet<>() : new HashSet<>(availableSports);
             return this;
         }
 
@@ -122,69 +115,12 @@ public class SkiLift {
         }
 
         public SkiLift build() {
-            List<String> errors = collectValidationErrors();
-
-            if (!errors.isEmpty()) {
-                log.warn(ErrorMessageConstants.Logs.VALIDATION_FAILED, SkiLift.class.getSimpleName(),
-                        SkiLift.class.getPackage().getName(), String.join(", ", errors));
-
-                throw new ValidationException(SkiLift.class.getSimpleName(), ValidationContextType.MODEL, errors);
-            }
-
             return new SkiLift(this);
         }
 
-        private List<String> collectValidationErrors() {
-            List<String> errors = new ArrayList<>();
-
-            collectIdErrors(errors);
-            collectNameErrors(errors);
-            collectTypeErrors(errors);
-            collectStatusErrors(errors);
-            collectAvailableSportsErrors(errors);
-            collectCommissioningDateErrors(errors);
-
-            return errors;
-        }
-
-        private void collectIdErrors(List<String> errors) {
-            if (id == null) {
-                errors.add(ErrorMessageConstants.Errors.ID_NULL);
-            }
-        }
-
-        private void collectNameErrors(List<String> errors) {
-            if (name == null) {
-                errors.add(ErrorMessageConstants.Errors.NAME_NULL);
-            }
-        }
-
-        private void collectTypeErrors(List<String> errors) {
-            if (type == null) {
-                errors.add(ErrorMessageConstants.Errors.TYPE_NULL);
-            }
-        }
-
-        private void collectStatusErrors(List<String> errors) {
-            if (status == null) {
-                errors.add(ErrorMessageConstants.Errors.STATUS_NULL);
-            }
-        }
-
-        private void collectAvailableSportsErrors(List<String> errors) {
-            if (availableSports == null) {
-                errors.add(ErrorMessageConstants.Errors.AVAILABLE_SPORTS_NULL);
-            }
-        }
-
-        private void collectCommissioningDateErrors(List<String> errors) {
-            if (commissioningDate == null) {
-                errors.add(ErrorMessageConstants.Errors.COMMISSIONING_DATE_NULL);
-            }
-        }
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

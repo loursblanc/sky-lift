@@ -15,33 +15,37 @@ import static fr.apsprevoyance.skylift.constants.TestConstants.SkiLift.VALID_NAM
 import static fr.apsprevoyance.skylift.constants.TestConstants.SkiLift.VALID_STATUS;
 import static fr.apsprevoyance.skylift.constants.TestConstants.SkiLift.VALID_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
-import fr.apsprevoyance.skylift.enums.ValidationContextType;
-import fr.apsprevoyance.skylift.exception.ValidationException;
+import fr.apsprevoyance.skylift.validation.ModelValidationService;
 
 @Tag("model")
 public class SkiLiftTest {
 
     private SkiLift.Builder builder;
+    private ModelValidationService validationService;
 
     @BeforeEach
     public void setUp() {
         builder = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
                 .comment(VALID_COMMENT).availableSports(VALID_AVAILABLE_SPORTS)
                 .commissioningDate(VALID_COMMISSIONING_DATE);
+
+        validationService = new ModelValidationService();
     }
 
     @Test
@@ -59,86 +63,22 @@ public class SkiLiftTest {
     }
 
     @Test
-    public void skiLift_with_null_id_throws_validation_exception() {
-        builder.id(null);
+    public void validation_detects_negative_id() {
+        SkiLift skiLift = SkiLift.builder().id(-1L).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS).build();
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
+        List<String> violations = validationService.checkWithAnnotations(skiLift);
 
-        assertEquals(1, exception.getValidationErrors().size());
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.ID_NULL));
-        assertEquals(SkiLift.class.getSimpleName(), exception.getModelName());
-        assertEquals(ValidationContextType.MODEL, exception.getContextType());
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.contains("id") && v.contains("positive")));
     }
 
     @Test
-    public void skiLift_with_null_name_throws_validation_exception() {
-        builder.name(null);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
-
-        assertEquals(1, exception.getValidationErrors().size());
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.NAME_NULL));
-    }
-
-    @Test
-    public void skiLift_with_null_type_throws_validation_exception() {
-        builder.type(null);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
-
-        assertEquals(1, exception.getValidationErrors().size());
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.TYPE_NULL));
-    }
-
-    @Test
-    public void skiLift_with_null_status_throws_validation_exception() {
-        builder.status(null);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
-
-        assertEquals(1, exception.getValidationErrors().size());
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.STATUS_NULL));
-    }
-
-    @Test
-    public void skiLift_with_null_available_sports_throws_validation_exception() {
-        builder.availableSports(null);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
-
-        assertEquals(1, exception.getValidationErrors().size());
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.AVAILABLE_SPORTS_NULL));
-    }
-
-    @Test
-    public void skiLift_with_null_commissioning_date_throws_validation_exception() {
-        builder.commissioningDate(null);
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            builder.build();
-        });
-
-        assertEquals(1, exception.getValidationErrors().size());
-        assertTrue(exception.getValidationErrors().contains(ErrorMessageConstants.Errors.COMMISSIONING_DATE_NULL));
-    }
-
-    @Test
-    public void skiLift_with_comment_can_be_null() {
+    public void availableSports_is_empty_set_when_null_is_provided() {
         SkiLift skiLift = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
-                .comment(null).availableSports(VALID_AVAILABLE_SPORTS).commissioningDate(VALID_COMMISSIONING_DATE)
-                .build();
+                .availableSports(null).build();
 
-        assertNull(skiLift.getComment());
+        assertNotNull(skiLift.getAvailableSports());
+        assertTrue(skiLift.getAvailableSports().isEmpty());
     }
 
     @Test
@@ -156,6 +96,7 @@ public class SkiLiftTest {
         SkiLift skiLift2 = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
                 .comment(VALID_COMMENT).availableSports(VALID_AVAILABLE_SPORTS)
                 .commissioningDate(VALID_COMMISSIONING_DATE).build();
+
         SkiLift differentSkiLift = SkiLift.builder().id(DIFFERENT_ID).name(DIFFERENT_NAME).type(DIFFERENT_TYPE)
                 .status(DIFFERENT_STATUS).comment(DIFFERENT_COMMENT).availableSports(DIFFERENT_AVAILABLE_SPORTS)
                 .commissioningDate(DIFFERENT_COMMISSIONING_DATE).build();
@@ -189,5 +130,20 @@ public class SkiLiftTest {
 
         assertTrue(skiLift.getAvailableSports().containsAll(initialSports));
         assertTrue(skiLift.getAvailableSports().contains(newSport));
+    }
+
+    @Test
+    public void default_commissioning_date_is_today() {
+        SkiLift skiLift = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS).build();
+
+        assertEquals(LocalDate.now(), skiLift.getCommissioningDate());
+    }
+
+    @Test
+    public void comment_can_be_null() {
+        SkiLift skiLift = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
+                .comment(null).build();
+
+        assertNull(skiLift.getComment());
     }
 }

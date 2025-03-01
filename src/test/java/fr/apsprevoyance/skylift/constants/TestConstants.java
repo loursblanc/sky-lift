@@ -19,10 +19,10 @@ public final class TestConstants {
     public static final Long SPORT_DIFFERENT_ID = 456L;
     public static final String SPORT_DIFFERENT_DESCRIPTION = "Snowboard freestyle";
 
-    public static final String SKILIFT_VALID_ID = "789";
+    public static final Long SKILIFT_VALID_ID = 789L;
     public static final String SKILIFT_VALID_NAME = "Télésiège des Marmottes";
     public static final String SKILIFT_VALID_COMMENT = "Main ski lift";
-    public static final String SKILIFT_DIFFERENT_ID = "101112";
+    public static final Long SKILIFT_DIFFERENT_ID = 101112L;
     public static final String SKILIFT_DIFFERENT_NAME = "Télécabine de la Combe";;
     public static final String SKILIFT_DIFFERENT_COMMENT = "Closed for maintenance";
 
@@ -57,7 +57,7 @@ public final class TestConstants {
     }
 
     public static final class SkiLift {
-        public static final String VALID_ID = SKILIFT_VALID_ID;
+        public static final Long VALID_ID = SKILIFT_VALID_ID;
         public static final String VALID_NAME = SKILIFT_VALID_NAME;
         public static final SkiLiftType VALID_TYPE = SkiLiftType.TELESIEGE;
         public static final SkiLiftStatus VALID_STATUS = SkiLiftStatus.OPEN;
@@ -65,7 +65,7 @@ public final class TestConstants {
         public static final LocalDate VALID_COMMISSIONING_DATE = LocalDate.now();
         public static final Set<String> VALID_AVAILABLE_SPORTS = createValidSports();
 
-        public static final String DIFFERENT_ID = SKILIFT_DIFFERENT_ID;
+        public static final Long DIFFERENT_ID = SKILIFT_DIFFERENT_ID;
         public static final String DIFFERENT_NAME = SKILIFT_DIFFERENT_NAME;
         public static final SkiLiftType DIFFERENT_TYPE = SkiLiftType.TELECABLE;
         public static final SkiLiftStatus DIFFERENT_STATUS = SkiLiftStatus.CLOSED;

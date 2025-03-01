@@ -10,19 +10,23 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.groups.Default;
 
 public class SportDTO {
 
     @NotNull(groups = OnUpdate.class, message = AnnotationMessages.Id.NULL)
-    @Positive(message = AnnotationMessages.Id.POSITIVE)
+    @Positive(groups = { OnUpdate.class, OnCreate.class, Default.class }, message = AnnotationMessages.Id.POSITIVE)
     private Long id;
 
     @NotBlank(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Name.EMPTY)
-    @Size(min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TEXT_LENGHT)
-    @Pattern(regexp = ValidationConstants.REGEX_NAME_VALID_CHARS, message = AnnotationMessages.Name.INVALID_CHARS)
+    @Size(groups = { OnUpdate.class, OnCreate.class,
+            Default.class }, min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TEXT_LENGHT)
+    @Pattern(groups = { OnUpdate.class, OnCreate.class,
+            Default.class }, regexp = ValidationConstants.REGEX_NAME_VALID_CHARS, message = AnnotationMessages.Name.INVALID_CHARS)
     private String name;
 
-    @Size(max = ValidationConstants.DESCRIPTION_MAX_LENGTH, message = AnnotationMessages.Description.TOO_LENGHT)
+    @Size(groups = { OnUpdate.class, OnCreate.class,
+            Default.class }, max = ValidationConstants.DESCRIPTION_MAX_LENGTH, message = AnnotationMessages.Description.TOO_LENGHT)
     private String description;
 
     private boolean active = true;
