@@ -33,8 +33,9 @@ public class DispatcherController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSport);
     }
 
-    @PostMapping("Ski-Lifts")
+    @PostMapping("/ski-lifts")
     public ResponseEntity<SkiLiftDTO> createSkiLift(@Validated(OnCreate.class) @RequestBody SkiLiftDTO skiLiftDTO) {
+        System.out.println("je suis dans mon controlleur");
         SkiLiftDTO createdSkiLif = skiLiftService.createSkiLift(skiLiftDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSkiLif);
     }

@@ -2,6 +2,7 @@ package fr.apsprevoyance.skylift.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -249,5 +250,57 @@ public class SkiLiftTest {
         assertEquals(2, skiLift.getAvailableSports().size());
         assertTrue(skiLift.getAvailableSports().contains(SportLabels.SKI));
         assertTrue(skiLift.getAvailableSports().contains(SportLabels.SNOWBOARD));
+    }
+
+    @Test
+    public void equals_should_return_true_for_same_object() {
+        SkiLift originalSkiLift = skiLift;
+        assertEquals(skiLift, originalSkiLift);
+    }
+
+    @Test
+    public void equals_should_return_true_for_objects_with_same_values() {
+        SkiLift identicalSkiLift = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
+                .comment(VALID_COMMENT).availableSports(VALID_SPORTS).commissioningDate(VALID_DATE).build();
+
+        assertEquals(skiLift, identicalSkiLift);
+    }
+
+    @Test
+    public void equals_should_return_false_for_different_objects() {
+        SkiLift differentSkiLift = SkiLift.builder().id(2L).name("Different Lift").type(SkiLiftType.TELESKI)
+                .status(SkiLiftStatus.CLOSED).comment("Different Comment")
+                .availableSports(new HashSet<>(Set.of(SportLabels.SLEDGE)))
+                .commissioningDate(LocalDate.now().minusYears(1)).build();
+
+        assertNotEquals(skiLift, differentSkiLift);
+    }
+
+    @Test
+    public void equals_should_return_false_when_comparing_to_null() {
+        assertNotEquals(skiLift, null);
+    }
+
+    @Test
+    public void equals_should_return_false_when_comparing_to_different_type() {
+        assertNotEquals(skiLift, new Object());
+    }
+
+    @Test
+    public void hashCode_should_be_consistent() {
+        SkiLift identicalSkiLift = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
+                .comment(VALID_COMMENT).availableSports(VALID_SPORTS).commissioningDate(VALID_DATE).build();
+
+        assertEquals(skiLift.hashCode(), identicalSkiLift.hashCode());
+    }
+
+    @Test
+    public void hashCode_should_be_different_for_different_objects() {
+        SkiLift differentSkiLift = SkiLift.builder().id(2L).name("Different Lift").type(SkiLiftType.TELESKI)
+                .status(SkiLiftStatus.CLOSED).comment("Different Comment")
+                .availableSports(new HashSet<>(Set.of(SportLabels.SLEDGE)))
+                .commissioningDate(LocalDate.now().minusYears(1)).build();
+
+        assertNotEquals(skiLift.hashCode(), differentSkiLift.hashCode());
     }
 }
