@@ -52,8 +52,6 @@ public final class TestConstants {
 
         public static final String INVALID_ID_NON_NUMERIC = "abc";
 
-        private Sport() {
-        }
     }
 
     public static final class SkiLift {
