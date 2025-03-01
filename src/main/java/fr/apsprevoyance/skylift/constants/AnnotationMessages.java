@@ -36,6 +36,15 @@ public final class AnnotationMessages {
         public static final String NULL = "Type cannot be null";
     }
 
+    public static final class Status {
+        public static final String NULL = "Status cannot be null";
+    }
+
+    public static final class AvaiableSports {
+        public static final String NULL = "AvaiableSports cannot be null";
+        public static final String EMPTY = "AvaiableSports cannot be empty";
+    }
+
     public static final class Date {
         public static final String NULL = "Date cannot be null";
         public static final String TOO_OLD = "Date is too old to be valid";

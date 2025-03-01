@@ -6,41 +6,49 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.apsprevoyance.skylift.constants.AnnotationMessages;
+import fr.apsprevoyance.skylift.constants.ValidationConstants;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.validation.OnCreate;
 import fr.apsprevoyance.skylift.validation.OnUpdate;
+import fr.apsprevoyance.skylift.validation.ValidSkiLiftDate;
 import jakarta.annotation.Generated;
 import jakarta.annotation.Nonnull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.groups.Default;
 
 public class SkiLift {
 
-    @NotNull(groups = { OnCreate.class, OnUpdate.class }, message = AnnotationMessages.Id.NULL)
-    @Positive(groups = { OnCreate.class, OnUpdate.class, Default.class }, message = AnnotationMessages.Id.POSITIVE)
-    private final Long id;
+    @NotNull(groups = OnUpdate.class, message = AnnotationMessages.Id.NULL)
+    @Positive(message = AnnotationMessages.Id.POSITIVE)
+    private Long id;
 
-    @NotNull
+    @NotBlank(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Name.EMPTY)
+    @Size(min = ValidationConstants.NAME_MIN_LENGTH, max = ValidationConstants.NAME_MAX_LENGTH, message = AnnotationMessages.Name.TEXT_LENGHT)
+    @Pattern(regexp = ValidationConstants.REGEX_NAME_VALID_CHARS, message = AnnotationMessages.Name.INVALID_CHARS)
     private final String name;
 
-    @NotNull
+    @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Type.NULL)
     private final SkiLiftType type;
 
-    @NotNull
+    @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Status.NULL)
     private final SkiLiftStatus status;
 
+    @Size(max = ValidationConstants.DESCRIPTION_MAX_LENGTH, message = AnnotationMessages.Description.TOO_LENGHT)
     private final String comment;
 
-    @NotNull
+    @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.AvaiableSports.NULL)
+    @NotEmpty(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.AvaiableSports.EMPTY)
     private final Set<String> availableSports;
 
-    @NotNull
+    @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Date.NULL)
+    @ValidSkiLiftDate(groups = { OnUpdate.class, OnCreate.class, Default.class })
     private final LocalDate commissioningDate;
 
     @Generated("SparkTools")
@@ -61,7 +69,6 @@ public class SkiLift {
 
     @Generated("SparkTools")
     public static final class Builder {
-        private static final Logger log = LoggerFactory.getLogger(Builder.class);
 
         private Long id;
         private String name;
