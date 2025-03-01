@@ -3,142 +3,113 @@ package fr.apsprevoyance.skylift.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
+import fr.apsprevoyance.skylift.constants.TestTag;
 import fr.apsprevoyance.skylift.dto.SportDTO;
 import fr.apsprevoyance.skylift.enums.Season;
 import fr.apsprevoyance.skylift.mapper.SportMapper;
 import fr.apsprevoyance.skylift.model.Sport;
 import fr.apsprevoyance.skylift.repository.SportRepository;
 import fr.apsprevoyance.skylift.validation.ModelValidationService;
+import fr.apsprevoyance.skylift.validation.OnCreate;
 
-@Tag("repository")
+@Tag(TestTag.SERVICE)
+@ExtendWith(MockitoExtension.class)
 class SportServiceImplTest {
 
-    private static class SportRepositoryInMemory implements SportRepository {
-        private final List<Sport> sports = new ArrayList<>();
-        private long nextId = 1L;
+    private static final String SPORT_NAME = "Ski";
+    private static final String SPORT_DESCRIPTION = "Winter sport";
+    private static final Long SPORT_ID = 1L;
+    private static final String MODEL_NAME = "Sport";
+    private static final String NULL_SPORT_DTO_MESSAGE = "SportDTO cannot be null";
 
-        @Override
-        public Sport create(Sport sport) {
-            Sport sportWithId = Sport.builder().id(nextId++).name(sport.getName()).description(sport.getDescription())
-                    .active(sport.isActive()).season(sport.getSeason()).build();
-            sports.add(sportWithId);
-            return sportWithId;
-        }
+    @Mock
+    private SportRepository sportRepository;
 
-        private SportMapper sportMapper = new SportMapper() {
-            @Override
-            public Sport toEntityForCreate(SportDTO dto) {
-                return Sport.builder().name(dto.getName())
-                        .description(dto.getDescription() != null ? dto.getDescription() : "").active(dto.isActive())
-                        .season(dto.getSeason()).build();
-            }
+    @Mock
+    private SportMapper sportMapper;
 
-            @Override
-            public SportDTO toDto(Sport entity) {
-                SportDTO dto = new SportDTO();
-                dto.setId(entity.getId());
-                dto.setName(entity.getName());
-                dto.setDescription(entity.getDescription());
-                dto.setActive(entity.isActive());
-                dto.setSeason(entity.getSeason());
-                return dto;
-            }
+    @Mock
+    private ModelValidationService modelValidationService;
 
-            @Override
-            public Sport toEntityForUpdate(SportDTO dto) {
-                return Sport.builder().id(dto.getId()).name(dto.getName())
-                        .description(dto.getDescription() != null ? dto.getDescription() : "").active(dto.isActive())
-                        .season(dto.getSeason()).build();
-            }
+    @InjectMocks
+    private SportServiceImpl sportService;
 
-            @Override
-            public Sport.Builder dtoToBuilderForCreate(SportDTO dto) {
-                if (dto == null) {
-                    return Sport.builder();
-                }
-                return Sport.builder().name(dto.getName()).description(dto.getDescription()).active(dto.isActive())
-                        .season(dto.getSeason());
-            }
+    private SportDTO sportDTO;
+    private Sport sport;
+    private Sport createdSport;
 
-            @Override
-            public Sport.Builder dtoToBuilderForUpdate(SportDTO dto) {
-                if (dto == null) {
-                    return Sport.builder();
-                }
-                return Sport.builder().id(dto.getId()).name(dto.getName()).description(dto.getDescription())
-                        .active(dto.isActive()).season(dto.getSeason());
-            }
-        };
+    @BeforeEach
+    void setUp() {
+        sportDTO = new SportDTO();
+        sportDTO.setName(SPORT_NAME);
+        sportDTO.setDescription(SPORT_DESCRIPTION);
+        sportDTO.setSeason(Season.WINTER);
 
-        private SportRepository sportRepository;
-        private ModelValidationService modelValidationService;
-        private SportServiceImpl sportService;
+        sport = Sport.builder().name(SPORT_NAME).description(SPORT_DESCRIPTION).season(Season.WINTER).build();
 
-        @BeforeEach
-        void setUp() {
-            sportRepository = new SportRepositoryInMemory();
-            modelValidationService = new ModelValidationService();
-            sportService = new SportServiceImpl(sportRepository, sportMapper, modelValidationService);
-        }
+        createdSport = Sport.builder().id(SPORT_ID).name(SPORT_NAME).description(SPORT_DESCRIPTION)
+                .season(Season.WINTER).build();
+    }
 
-        @Test
-        void createSport_shouldCreateSportSuccessfully() {
+    @Test
+    void createSport_shouldCreateSport() {
+        when(sportMapper.toEntityForCreate(sportDTO)).thenReturn(sport);
+        when(sportRepository.create(sport)).thenReturn(createdSport);
+        when(sportMapper.toDto(createdSport)).thenReturn(sportDTO);
 
-            SportDTO sportDTO = new SportDTO();
-            sportDTO.setName("Ski");
-            sportDTO.setSeason(Season.WINTER);
-            sportDTO.setActive(true);
+        SportDTO result = sportService.createSport(sportDTO);
 
-            SportDTO createdSport = sportService.createSport(sportDTO);
+        assertNotNull(result);
+        assertEquals(sportDTO, result);
+        verify(modelValidationService).checkAndThrowIfInvalid(sport, MODEL_NAME, OnCreate.class);
+        verify(sportRepository).create(sport);
+        verify(sportMapper).toDto(createdSport);
+    }
 
-            assertNotNull(createdSport);
-            assertNotNull(createdSport.getId());
-            assertEquals("Ski", createdSport.getName());
-            assertEquals(Season.WINTER, createdSport.getSeason());
-            assertTrue(createdSport.isActive());
-        }
+    @Test
+    void createSport_withNullDTO_shouldThrowNullPointerException() {
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> {
+            sportService.createSport(null);
+        });
 
-        @Test
-        void createSport_shouldThrowExceptionWhenDTOIsNull() {
+        assertEquals(NULL_SPORT_DTO_MESSAGE, exception.getMessage());
+    }
 
-            assertThrows(NullPointerException.class, () -> {
-                sportService.createSport(null);
-            });
-        }
+    @Test
+    void createSport_whenValidationFails_shouldPropagateException() {
+        when(sportMapper.toEntityForCreate(sportDTO)).thenReturn(sport);
 
-        @Test
-        void createSport_shouldSetDefaultDescriptionWhenNull() {
+        doThrow(new IllegalArgumentException(ErrorMessageConstants.Errors.NAME_NULL)).when(modelValidationService)
+                .checkAndThrowIfInvalid(eq(sport), eq(MODEL_NAME), any());
 
-            SportDTO sportDTO = new SportDTO();
-            sportDTO.setName("Snowboard");
-            sportDTO.setSeason(Season.WINTER);
-            sportDTO.setDescription(null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            sportService.createSport(sportDTO);
+        });
+    }
 
-            SportDTO createdSport = sportService.createSport(sportDTO);
+    @Test
+    void createSport_whenRepositoryFails_shouldPropagateException() {
+        when(sportMapper.toEntityForCreate(sportDTO)).thenReturn(sport);
+        when(sportRepository.create(sport))
+                .thenThrow(new RuntimeException(ErrorMessageConstants.General.INTERNAL_ERROR));
 
-            assertNotNull(createdSport);
-            assertEquals("", createdSport.getDescription());
-        }
-
-        @Test
-        void createSport_shouldUseDefaultActiveStateWhenNotSpecified() {
-
-            SportDTO sportDTO = new SportDTO();
-            sportDTO.setName("Sledge");
-            sportDTO.setSeason(Season.WINTER);
-
-            SportDTO createdSport = sportService.createSport(sportDTO);
-
-            assertTrue(createdSport.isActive());
-        }
+        assertThrows(RuntimeException.class, () -> {
+            sportService.createSport(sportDTO);
+        });
     }
 }
