@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,9 +25,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
+import fr.apsprevoyance.skylift.constants.TestTag;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.response.ErrorResponse;
 
+@Tag(TestTag.EXCEPTION)
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
 
