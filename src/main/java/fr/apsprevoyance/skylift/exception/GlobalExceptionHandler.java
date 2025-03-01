@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
         String errorDetail = ErrorMessageConstants.Validation.REQUEST_PARSING_ERROR;
-        String logDetail = ex.getMessage(); // Version complète pour les logs
+        String logDetail = ex.getMessage();
 
         Throwable rootCause = ex.getRootCause();
         if (rootCause != null) {
@@ -62,23 +62,20 @@ public class GlobalExceptionHandler {
                 JsonParseException jpe = (JsonParseException) rootCause;
                 JsonLocation location = jpe.getLocation();
 
-                // Message pour les logs (peut contenir des détails techniques)
-                logDetail = String.format("JSON parse error at line %d, column %d: %s", location.getLineNr(),
+                logDetail = String.format(ErrorMessageConstants.Json.PARSE_ERROR, location.getLineNr(),
                         location.getColumnNr(), jpe.getOriginalMessage());
 
-                // Message pour le client (sans détails d'implémentation)
-                errorDetail = String.format(ErrorMessageConstants.Validation.JSON_PARSE_ERROR_SAFE,
-                        location.getLineNr(), location.getColumnNr());
+                errorDetail = String.format(ErrorMessageConstants.Json.PARSE_ERROR_SAFE, location.getLineNr(),
+                        location.getColumnNr());
             } else if (rootCause instanceof UnrecognizedPropertyException) {
                 UnrecognizedPropertyException upe = (UnrecognizedPropertyException) rootCause;
 
-                logDetail = String.format("Unknown property in request: %s", upe.getPropertyName());
+                logDetail = String.format(ErrorMessageConstants.Json.UNKNOWN_PROPERTY, upe.getPropertyName());
 
-                errorDetail = String.format(ErrorMessageConstants.Validation.JSON_UNKNOWN_PROPERTY_SAFE,
-                        upe.getPropertyName());
+                errorDetail = String.format(ErrorMessageConstants.Json.UNKNOWN_PROPERTY_SAFE, upe.getPropertyName());
             } else if (rootCause instanceof JsonMappingException) {
                 logDetail = rootCause.getMessage();
-                errorDetail = ErrorMessageConstants.Validation.JSON_MAPPING_ERROR_SAFE;
+                errorDetail = ErrorMessageConstants.Json.MAPPING_ERROR_SAFE;
             } else {
                 logDetail = rootCause.getMessage();
                 errorDetail = ErrorMessageConstants.Validation.REQUEST_PARSING_ERROR;
@@ -109,7 +106,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateEntityException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateEntityException(DuplicateEntityException ex) {
-        // Log complet
+
         log.warn(ErrorMessageConstants.Logs.DUPLICATE_ENTITY, ex.getEntityName(), ex.getField(), ex.getValue());
 
         String clientMessage = String.format(ErrorMessageConstants.Validation.DUPLICATE_ENTITY_SAFE,
@@ -123,10 +120,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        // Log complet avec la trace pour le débogage
+
         log.error(ErrorMessageConstants.Logs.UNCAUGHT_EXCEPTION, ex);
 
-        // Message générique pour le client
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 ErrorMessageConstants.General.INTERNAL_ERROR, List.of(ErrorMessageConstants.General.INTERNAL_ERROR));
 
@@ -153,9 +149,6 @@ public class GlobalExceptionHandler {
                 fieldError.getDefaultMessage());
     }
 
-    /**
-     * Convertit le nom technique de l'entité en nom lisible pour l'utilisateur
-     */
     private String sanitizeEntityName(String entityName) {
         switch (entityName) {
         case "SkiLift":

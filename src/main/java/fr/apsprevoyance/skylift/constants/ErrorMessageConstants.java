@@ -26,12 +26,11 @@ public final class ErrorMessageConstants {
         public static final String PREFIX_PERSISTENCE = "Persistence error";
 
         public static final String REQUEST_PARSING_ERROR = "Failed to parse request body";
-        public static final String JSON_PARSE_ERROR_SAFE = "Invalid JSON format at line %d, column %d";
-        public static final String JSON_MAPPING_ERROR_SAFE = "Invalid data format in request";
-        public static final String JSON_UNKNOWN_PROPERTY_SAFE = "Unknown field: %s";
 
         public static final String ENTITY_NOT_FOUND_SAFE = "The requested %s with identifier %s was not found";
         public static final String DUPLICATE_ENTITY_SAFE = "A %s with these details already exists";
+        public static final String ERROR_DUPLICATE_MESSAGE = "Entity %s with %s %s already exists";
+        public static final String ENTITY_NOT_FOUND = "Entity %s with id %s not found";
     }
 
     public static final class Fields {
@@ -95,4 +94,13 @@ public final class ErrorMessageConstants {
         public static final String ENTITY_NOT_FOUND = "Entity {} with identifier {} not found";
         public static final String DUPLICATE_ENTITY = "Duplicate entity {} with {}={}";
     }
+
+    public static final class Json {
+        public static final String PARSE_ERROR = "JSON parse error at line %d, column %d: %s";
+        public static final String UNKNOWN_PROPERTY = "Unknown property in request: %s";
+        public static final String PARSE_ERROR_SAFE = "Invalid JSON format at line %d, column %d";
+        public static final String MAPPING_ERROR_SAFE = "Invalid data format in request";
+        public static final String UNKNOWN_PROPERTY_SAFE = "Unknown field: %s";
+    }
+
 }

@@ -1,5 +1,7 @@
 package fr.apsprevoyance.skylift.exception;
 
+import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
+
 public class DuplicateEntityException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
@@ -8,7 +10,7 @@ public class DuplicateEntityException extends RuntimeException {
     private final String value;
 
     public DuplicateEntityException(String entityName, String field, String value) {
-        super(String.format("Entity %s with %s %s already exists", entityName, field, value));
+        super(String.format(ErrorMessageConstants.Validation.ERROR_DUPLICATE_MESSAGE, entityName, field, value));
         this.entityName = entityName;
         this.field = field;
         this.value = value;

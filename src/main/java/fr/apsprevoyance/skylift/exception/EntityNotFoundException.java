@@ -1,5 +1,7 @@
 package fr.apsprevoyance.skylift.exception;
 
+import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
+
 public class EntityNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
@@ -7,7 +9,7 @@ public class EntityNotFoundException extends RuntimeException {
     private final String identifier;
 
     public EntityNotFoundException(String entityName, String identifier) {
-        super(String.format("Entity %s with id %s not found", entityName, identifier));
+        super(String.format(ErrorMessageConstants.Validation.ENTITY_NOT_FOUND, entityName, identifier));
         this.entityName = entityName;
         this.identifier = identifier;
     }
