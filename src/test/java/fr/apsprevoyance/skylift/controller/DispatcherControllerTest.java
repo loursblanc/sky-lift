@@ -40,13 +40,13 @@ class DispatcherControllerTest {
         static final Long SPORT_DIFFERENT_ID = 2L;
         static final String SPORT_NAME = "Ski Alpin";
         static final String SPORT_ENTITY_NAME = "Sport";
-        static final String SPORT_ID_MISMATCH_ERROR = "L'ID de l'URL ne correspond pas à l'ID du sport dans le corps de la requête";
+        static final String SPORT_ID_MISMATCH_ERROR = "The URL ID does not match the ID of the sport in the request body";
 
         static final Long SKI_LIFT_VALID_ID = 789L;
         static final Long SKI_LIFT_DIFFERENT_ID = 101112L;
         static final String SKI_LIFT_NAME = "Télésiège des Marmottes";
         static final String SKI_LIFT_ENTITY_NAME = "SkiLift";
-        static final String SKI_LIFT_ID_MISMATCH_ERROR = "L'ID de l'URL ne correspond pas à l'ID de la remontée dans le corps de la requête";
+        static final String SKI_LIFT_ID_MISMATCH_ERROR = "The URL ID does not match the upstream ID in the request body";
     }
 
     private SportService sportService;
