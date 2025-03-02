@@ -18,11 +18,13 @@ import org.junit.jupiter.api.Test;
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
 import fr.apsprevoyance.skylift.constants.SportLabels;
 import fr.apsprevoyance.skylift.constants.TestTag;
+import fr.apsprevoyance.skylift.enums.Season;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.exception.EntityNotFoundException;
 import fr.apsprevoyance.skylift.exception.ValidationException;
 import fr.apsprevoyance.skylift.model.SkiLift;
+import fr.apsprevoyance.skylift.model.Sport;
 
 @Tag(TestTag.REPOSITORY)
 class SkiLiftRepositoryInMemoryTest {
@@ -44,9 +46,11 @@ class SkiLiftRepositoryInMemoryTest {
     }
 
     private SkiLift createValidSkiLift(String name) {
-        Set<String> sports = Set.of(SportLabels.SKI);
+        // Créer un Sport à partir du label
+        Sport skiSport = Sport.builder().name(SportLabels.SKI).season(Season.WINTER).active(true).build();
+
         return SkiLift.builder().name(name).type(SkiLiftType.TELESIEGE).status(SkiLiftStatus.OPEN)
-                .availableSports(sports).commissioningDate(LocalDate.now()).build();
+                .availableSports(Set.of(skiSport)).commissioningDate(LocalDate.now()).build();
     }
 
     @Test
@@ -86,9 +90,10 @@ class SkiLiftRepositoryInMemoryTest {
     void create_withPreDefinedId_shouldThrowValidationException() {
         SkiLift originalSkiLift = createValidSkiLift(TestConstants.LIFT_NAME_1);
 
+        Sport skiSport = Sport.builder().name(SportLabels.SKI).season(Season.WINTER).active(true).build();
+
         SkiLift skiLiftWithId = SkiLift.builder().id(TestConstants.PREDEFINED_ID).name(originalSkiLift.getName())
-                .type(originalSkiLift.getType()).status(originalSkiLift.getStatus())
-                .availableSports(originalSkiLift.getAvailableSports())
+                .type(originalSkiLift.getType()).status(originalSkiLift.getStatus()).availableSports(Set.of(skiSport))
                 .commissioningDate(originalSkiLift.getCommissioningDate()).build();
 
         assertThrows(ValidationException.class, () -> repository.create(skiLiftWithId));
@@ -135,8 +140,10 @@ class SkiLiftRepositoryInMemoryTest {
     void update_shouldUpdateSkiLift() {
         SkiLift createdSkiLift = repository.create(createValidSkiLift(TestConstants.LIFT_NAME_1));
 
+        Sport snowboardSport = Sport.builder().name(SportLabels.SNOWBOARD).season(Season.WINTER).active(true).build();
+
         SkiLift skiLiftToUpdate = SkiLift.builder().id(createdSkiLift.getId()).name(TestConstants.LIFT_NAME_2)
-                .type(SkiLiftType.TELESKI).status(SkiLiftStatus.CLOSED).availableSports(Set.of(SportLabels.SNOWBOARD))
+                .type(SkiLiftType.TELESKI).status(SkiLiftStatus.CLOSED).availableSports(Set.of(snowboardSport))
                 .commissioningDate(LocalDate.now().minusYears(1)).build();
 
         SkiLift updatedSkiLift = repository.update(skiLiftToUpdate);
@@ -149,12 +156,11 @@ class SkiLiftRepositoryInMemoryTest {
 
     @Test
     void update_shouldThrowExceptionWhenSkiLiftNotFound() {
-        SkiLift originalSkiLift = createValidSkiLift(TestConstants.LIFT_NAME_1);
+        Sport skiSport = Sport.builder().name(SportLabels.SKI).season(Season.WINTER).active(true).build();
 
-        SkiLift skiLiftToUpdate = SkiLift.builder().id(TestConstants.NONEXISTENT_ID).name(originalSkiLift.getName())
-                .type(originalSkiLift.getType()).status(originalSkiLift.getStatus())
-                .availableSports(originalSkiLift.getAvailableSports())
-                .commissioningDate(originalSkiLift.getCommissioningDate()).build();
+        SkiLift skiLiftToUpdate = SkiLift.builder().id(TestConstants.NONEXISTENT_ID).name(TestConstants.LIFT_NAME_1)
+                .type(SkiLiftType.TELESIEGE).status(SkiLiftStatus.OPEN).availableSports(Set.of(skiSport))
+                .commissioningDate(LocalDate.now()).build();
 
         assertThrows(EntityNotFoundException.class, () -> repository.update(skiLiftToUpdate));
     }

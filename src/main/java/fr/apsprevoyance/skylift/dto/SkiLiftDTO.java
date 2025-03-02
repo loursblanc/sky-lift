@@ -90,11 +90,11 @@ public class SkiLiftDTO {
         this.comment = comment != null ? comment : "";
     }
 
-    public Set<String> getAvailableSports() {
+    public Set<Sport> getAvailableSports() {
         return availableSports;
     }
 
-    public void setAvailableSports(Set<String> availableSports) {
+    public void setAvailableSports(Set<Sport> availableSports) {
         this.availableSports = availableSports != null ? availableSports : new HashSet<>();
     }
 

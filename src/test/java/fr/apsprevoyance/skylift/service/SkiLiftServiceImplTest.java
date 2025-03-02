@@ -21,7 +21,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import fr.apsprevoyance.skylift.constants.SportLabels;
 import fr.apsprevoyance.skylift.constants.TestTag;
 import fr.apsprevoyance.skylift.dto.SkiLiftDTO;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
@@ -67,21 +66,21 @@ class SkiLiftServiceImplTest {
         skiLiftDTO.setType(SkiLiftType.TELESIEGE);
         skiLiftDTO.setStatus(SkiLiftStatus.OPEN);
         skiLiftDTO.setComment("Test Comment");
-        skiLiftDTO.setAvailableSports(Set.of(SportLabels.SKI));
+        skiLiftDTO.setAvailableSports(Set.of());
         skiLiftDTO.setCommissioningDate(LocalDate.now());
         return skiLiftDTO;
     }
 
     private SkiLift createValidSkiLift() {
         return SkiLift.builder().name(TestConstants.VALID_SKI_LIFT_NAME).type(SkiLiftType.TELESIEGE)
-                .status(SkiLiftStatus.OPEN).comment("Test Comment").availableSports(Set.of(SportLabels.SKI))
+                .status(SkiLiftStatus.OPEN).comment("Test Comment").availableSports(Set.of())
                 .commissioningDate(LocalDate.now()).build();
     }
 
     private SkiLift createValidSkiLiftWithId() {
         return SkiLift.builder().id(TestConstants.VALID_SKI_LIFT_ID).name(TestConstants.VALID_SKI_LIFT_NAME)
                 .type(SkiLiftType.TELESIEGE).status(SkiLiftStatus.OPEN).comment("Test Comment")
-                .availableSports(Set.of(SportLabels.SKI)).commissioningDate(LocalDate.now()).build();
+                .availableSports(Set.of()).commissioningDate(LocalDate.now()).build();
     }
 
     @Test
