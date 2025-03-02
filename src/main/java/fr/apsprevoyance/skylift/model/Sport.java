@@ -36,6 +36,14 @@ public class Sport {
     @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Season.NULL)
     private final Season season;
 
+    public Sport() {
+        // this.id = -1L;
+        this.name = "";
+        this.description = "";
+        this.active = false;
+        this.season = null;
+    }
+
     @Generated("SparkTools")
     private Sport(Builder builder) {
         this.id = builder.id;

@@ -23,6 +23,16 @@ public abstract class SportMapper {
 
     public abstract SportDTO toDto(Sport entity);
 
+    // Méthode supplémentaire pour conversion explicite
+    public Sport fromDtoToEntity(SportDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        return Sport.builder().id(dto.getId()).name(dto.getName()).description(dto.getDescription())
+                .active(dto.isActive()).season(dto.getSeason()).build();
+    }
+
     // Builders
     public Sport.Builder dtoToBuilderForCreate(SportDTO dto) {
         if (dto == null) {

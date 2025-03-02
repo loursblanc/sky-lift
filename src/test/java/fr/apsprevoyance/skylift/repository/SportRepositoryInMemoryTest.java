@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Primary;
 
 import fr.apsprevoyance.skylift.constants.TestConstants;
 import fr.apsprevoyance.skylift.constants.TestTag;
@@ -22,6 +23,7 @@ import fr.apsprevoyance.skylift.exception.ValidationException;
 import fr.apsprevoyance.skylift.model.Sport;
 
 @Tag(TestTag.REPOSITORY)
+@Primary
 class SportRepositoryInMemoryTest {
 
     private static final String ENTITY_NAME = "Sport";

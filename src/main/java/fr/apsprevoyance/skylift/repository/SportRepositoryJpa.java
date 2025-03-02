@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +21,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 
 @Repository
-@Primary
+
 public class SportRepositoryJpa implements SportRepository {
 
     private final EntityManager entityManager;
