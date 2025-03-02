@@ -3,45 +3,38 @@ package fr.apsprevoyance.skylift.repository;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
 import fr.apsprevoyance.skylift.constants.JpqlRequest;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.DuplicateEntityException;
+import fr.apsprevoyance.skylift.exception.EntityNotFoundException;
 import fr.apsprevoyance.skylift.exception.ValidationException;
 import fr.apsprevoyance.skylift.mapper.SportMapper;
 import fr.apsprevoyance.skylift.model.Sport;
 import fr.apsprevoyance.skylift.repository.entity.SportEntity;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.NoResultException;
 
 @Repository
 @Primary
 public class SportRepositoryJpa implements SportRepository {
 
-    private EntityManager entityManager;
-
+    private final EntityManager entityManager;
     private final SportMapper sportMapper;
 
     private static final String MODEL_NAME = Sport.class.getSimpleName();
-    private static final String REPOSITORY_CLASS_NAME = SportRepositoryJpa.class.getSimpleName();
-    private static final String MAPPER_CLASS_NAME = SportMapper.class.getSimpleName();
-    private static final String ENTITYMANAGER_CLASS_NAME = EntityManager.class.getSimpleName();
 
-    public SportRepositoryJpa(SportMapper sportMapper) {
-        this.sportMapper = Objects.requireNonNull(sportMapper,
-                String.format(ErrorMessageConstants.Validation.FIELD_NULL, MAPPER_CLASS_NAME));
-    }
-
-    @PersistenceContext
-    public void setEntityManager(EntityManager entityManager) {
+    public SportRepositoryJpa(EntityManager entityManager, SportMapper sportMapper) {
         this.entityManager = Objects.requireNonNull(entityManager,
-                String.format(ErrorMessageConstants.Validation.FIELD_NULL, ENTITYMANAGER_CLASS_NAME));
+                String.format(ErrorMessageConstants.Validation.FIELD_NULL, "EntityManager"));
+        this.sportMapper = Objects.requireNonNull(sportMapper,
+                String.format(ErrorMessageConstants.Validation.FIELD_NULL, "SportMapper"));
     }
 
     @Override
@@ -50,7 +43,7 @@ public class SportRepositoryJpa implements SportRepository {
         Objects.requireNonNull(sport, ErrorMessageConstants.Errors.SPORT_NULL);
 
         if (sport.getId() != null) {
-            throw new ValidationException(REPOSITORY_CLASS_NAME, ValidationContextType.PERSISTENCE,
+            throw new ValidationException(MODEL_NAME, ValidationContextType.PERSISTENCE,
                     ErrorMessageConstants.Errors.SPORT_ID_PREDEFINED);
         }
 
@@ -60,49 +53,85 @@ public class SportRepositoryJpa implements SportRepository {
                     ErrorMessageConstants.Errors.NAME_EMPTY);
         }
 
-        TypedQuery<Long> query = entityManager.createQuery(JpqlRequest.SPORT_COUNT_BY_NAME, Long.class);
-        query.setParameter("name", sportName);
+        long count = entityManager.createQuery(JpqlRequest.Sport.COUNT_BY_NAME, Long.class)
+                .setParameter("name", sportName).getSingleResult();
 
-        if (query.getSingleResult() > 0) {
+        if (count > 0) {
             throw new DuplicateEntityException(MODEL_NAME, ErrorMessageConstants.Fields.NAME, sportName);
         }
 
         SportEntity entity = sportMapper.toEntityForCreate(sport);
-
         entityManager.persist(entity);
-        entityManager.flush();
 
         return sportMapper.toDomain(entity);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Sport> findAll() {
-        // TODO Auto-generated method stub
-        return null;
+        List<SportEntity> entities = entityManager.createQuery(JpqlRequest.Sport.FIND_ALL, SportEntity.class)
+                .getResultList();
+
+        return entities.stream().map(sportMapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Sport> findById(Long id) {
-        // TODO Auto-generated method stub
-        return Optional.empty();
+        Objects.requireNonNull(id, ErrorMessageConstants.Errors.ID_NULL);
+
+        try {
+            SportEntity entity = entityManager.createQuery(JpqlRequest.Sport.FIND_BY_ID, SportEntity.class)
+                    .setParameter("id", id).getSingleResult();
+
+            return Optional.of(sportMapper.toDomain(entity));
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
+    @Transactional
     public Sport update(Sport sport) {
-        // TODO Auto-generated method stub
-        return null;
+        Objects.requireNonNull(sport, ErrorMessageConstants.Errors.SPORT_NULL);
+        Objects.requireNonNull(sport.getId(), ErrorMessageConstants.Errors.ID_NULL);
+
+        long count = entityManager.createQuery(JpqlRequest.Sport.COUNT_BY_NAME_EXCLUDING_CURRENT, Long.class)
+                .setParameter("name", sport.getName()).setParameter("id", sport.getId()).getSingleResult();
+
+        if (count > 0) {
+            throw new DuplicateEntityException(MODEL_NAME, ErrorMessageConstants.Fields.NAME, sport.getName());
+        }
+
+        SportEntity entityToUpdate = sportMapper.toEntityForUpdate(sport);
+        SportEntity updatedEntity = entityManager.merge(entityToUpdate);
+
+        return sportMapper.toDomain(updatedEntity);
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        // TODO Auto-generated method stub
+        Objects.requireNonNull(id, ErrorMessageConstants.Errors.ID_NULL);
 
+        try {
+            SportEntity entity = entityManager.createQuery(JpqlRequest.Sport.FIND_BY_ID, SportEntity.class)
+                    .setParameter("id", id).getSingleResult();
+
+            entityManager.remove(entity);
+        } catch (NoResultException e) {
+            throw new EntityNotFoundException(MODEL_NAME, id.toString());
+        }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean existsById(Long id) {
-        // TODO Auto-generated method stub
-        return false;
-    }
+        Objects.requireNonNull(id, ErrorMessageConstants.Errors.ID_NULL);
 
+        Long count = entityManager.createQuery(JpqlRequest.Sport.COUNT_BY_ID, Long.class).setParameter("id", id)
+                .getSingleResult();
+
+        return count > 0;
+    }
 }
