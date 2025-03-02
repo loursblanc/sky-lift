@@ -242,7 +242,8 @@ class SportRepositoryJpaTest {
         Sport updatedDomainSport = Sport.builder().id(TestConstants.Sport.VALID_ID).name(TestConstants.Sport.VALID_NAME)
                 .description("Updated Description").season(TestConstants.Sport.VALID_SEASON).active(false).build();
 
-        when(entityManager.createQuery(JpqlRequest.Sport.COUNT_BY_NAME, Long.class)).thenReturn(countQuery);
+        when(entityManager.createQuery(JpqlRequest.Sport.COUNT_BY_NAME_EXCLUDING_CURRENT, Long.class))
+                .thenReturn(countQuery);
         when(countQuery.setParameter("name", sportToUpdate.getName())).thenReturn(countQuery);
         when(countQuery.setParameter("id", sportToUpdate.getId())).thenReturn(countQuery);
         when(countQuery.getSingleResult()).thenReturn(0L);
