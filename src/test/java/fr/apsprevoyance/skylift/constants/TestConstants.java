@@ -88,8 +88,6 @@ public final class TestConstants {
             return sports;
         }
 
-        private SkiLift() {
-        }
     }
 
     public static final class ValidationTestMessages {
