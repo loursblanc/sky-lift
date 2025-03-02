@@ -12,6 +12,7 @@ import org.mapstruct.factory.Mappers;
 import fr.apsprevoyance.skylift.constants.TestConstants;
 import fr.apsprevoyance.skylift.dto.SportDTO;
 import fr.apsprevoyance.skylift.model.Sport;
+import fr.apsprevoyance.skylift.repository.entity.SportEntity;
 
 @Tag("mapper")
 class SportMapperTest {
@@ -121,5 +122,91 @@ class SportMapperTest {
         Sport.Builder builder = mapper.dtoToBuilderForUpdate(null);
 
         assertNotNull(builder);
+    }
+
+    @Test
+    void toEntityForCreate_should_map_sport_to_sportEntity_ignoring_id() {
+        Sport sport = Sport.builder().id(TestConstants.Sport.VALID_ID).name(TestConstants.Sport.VALID_NAME)
+                .description(TestConstants.Sport.VALID_DESCRIPTION).active(TestConstants.Sport.VALID_ACTIVE)
+                .season(TestConstants.Sport.VALID_SEASON).build();
+
+        SportEntity result = mapper.toEntityForCreate(sport);
+
+        assertNotNull(result);
+        assertNull(result.getId());
+        assertEquals(sport.getName(), result.getName());
+        assertEquals(sport.getDescription(), result.getDescription());
+        assertEquals(sport.isActive(), result.isActive());
+        assertEquals(sport.getSeason(), result.getSeason());
+    }
+
+    @Test
+    void toEntityForCreate_sport_should_handle_null_sport() {
+        SportEntity result = mapper.toEntityForCreate((Sport) null);
+
+        assertNull(result);
+    }
+
+    @Test
+    void toEntityForUpdate_should_map_sport_to_sportEntity_with_id() {
+        Sport sport = Sport.builder().id(TestConstants.Sport.VALID_ID).name(TestConstants.Sport.VALID_NAME)
+                .description(TestConstants.Sport.VALID_DESCRIPTION).active(TestConstants.Sport.VALID_ACTIVE)
+                .season(TestConstants.Sport.VALID_SEASON).build();
+
+        SportEntity result = mapper.toEntityForUpdate(sport);
+
+        assertNotNull(result);
+        assertEquals(sport.getId(), result.getId());
+        assertEquals(sport.getName(), result.getName());
+        assertEquals(sport.getDescription(), result.getDescription());
+        assertEquals(sport.isActive(), result.isActive());
+        assertEquals(sport.getSeason(), result.getSeason());
+    }
+
+    @Test
+    void toEntityForUpdate_should_handle_null_sport() {
+        SportEntity result = mapper.toEntityForUpdate((Sport) null);
+
+        assertNull(result);
+    }
+
+    @Test
+    void toDomain_should_map_sportEntity_to_sport() {
+        SportEntity entity = new SportEntity(TestConstants.Sport.VALID_ID, TestConstants.Sport.VALID_NAME,
+                TestConstants.Sport.VALID_DESCRIPTION, TestConstants.Sport.VALID_SEASON,
+                TestConstants.Sport.VALID_ACTIVE);
+
+        Sport result = mapper.toDomain(entity);
+
+        assertNotNull(result);
+        assertEquals(entity.getId(), result.getId());
+        assertEquals(entity.getName(), result.getName());
+        assertEquals(entity.getDescription(), result.getDescription());
+        assertEquals(entity.isActive(), result.isActive());
+        assertEquals(entity.getSeason(), result.getSeason());
+    }
+
+    @Test
+    void toDomain_should_handle_null_sportEntity() {
+        Sport result = mapper.toDomain(null);
+
+        assertNull(result);
+    }
+
+    @Test
+    void updateEntityFromDomain_should_update_sportEntity_from_sport() {
+        Sport sport = Sport.builder().id(TestConstants.Sport.VALID_ID).name(TestConstants.Sport.VALID_NAME)
+                .description(TestConstants.Sport.VALID_DESCRIPTION).active(TestConstants.Sport.VALID_ACTIVE)
+                .season(TestConstants.Sport.VALID_SEASON).build();
+
+        SportEntity entity = new SportEntity(null, "Old Name", "Old Description", TestConstants.Sport.VALID_SEASON,
+                false);
+
+        mapper.updateEntityFromDomain(sport, entity);
+
+        assertEquals(sport.getName(), entity.getName());
+        assertEquals(sport.getDescription(), entity.getDescription());
+        assertEquals(sport.isActive(), entity.isActive());
+        assertEquals(sport.getSeason(), entity.getSeason());
     }
 }
