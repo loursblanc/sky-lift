@@ -74,6 +74,15 @@ public final class TestConstants {
         public static final String INVALID_ID_NON_NUMERIC = "abc";
         public static final LocalDate INVALID_DATE_TOO_OLD = LocalDate.of(1900, 1, 1);
 
+        public static final Long NON_EXISTENT_ID = 999L;
+        public static final LocalDate VALID_DATE = LocalDate.of(2022, 12, 1);
+
+        public static final String UPDATED_NAME = "Télésiège des Montagnes";
+        public static final SkiLiftType UPDATED_TYPE = SkiLiftType.FENICULAR;
+        public static final SkiLiftStatus UPDATED_STATUS = SkiLiftStatus.MAINTENANCE;
+        public static final String UPDATED_COMMENT = "Commentaire mis à jour";
+        public static final LocalDate UPDATED_DATE = LocalDate.of(2023, 1, 15);
+
         private static Set<String> createValidSports() {
             Set<String> sports = new HashSet<>();
             sports.add(AllowedSportType.SKI.getLabel());

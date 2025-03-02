@@ -1,7 +1,9 @@
 package fr.apsprevoyance.skylift.repository;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -13,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
 import fr.apsprevoyance.skylift.constants.JpqlRequest;
+import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
+import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.DuplicateEntityException;
 import fr.apsprevoyance.skylift.exception.EntityNotFoundException;
@@ -23,6 +27,7 @@ import fr.apsprevoyance.skylift.model.Sport;
 import fr.apsprevoyance.skylift.repository.entity.SkiLiftEntity;
 import fr.apsprevoyance.skylift.repository.entity.SportEntity;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 @Repository
 @Primary
@@ -201,6 +206,34 @@ public class SkiLiftRepositoryJpa implements SkiLiftRepository {
                 .getSingleResult();
 
         return count > 0;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SkiLift> findByTypeAndStatus(SkiLiftType type, SkiLiftStatus status) {
+
+        StringBuilder queryBuilder = new StringBuilder("SELECT s FROM SkiLiftEntity s WHERE 1=1");
+        Map<String, Object> parameters = new HashMap<>();
+
+        if (type != null) {
+            queryBuilder.append(" AND s.type = :type");
+            parameters.put("type", type);
+        }
+
+        if (status != null) {
+            queryBuilder.append(" AND s.status = :status");
+            parameters.put("status", status);
+        }
+
+        TypedQuery<SkiLiftEntity> query = entityManager.createQuery(queryBuilder.toString(), SkiLiftEntity.class);
+
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            query.setParameter(entry.getKey(), entry.getValue());
+        }
+
+        List<SkiLiftEntity> entities = query.getResultList();
+
+        return skiLiftMapper.toDomainList(entities);
     }
 
 }

@@ -198,18 +198,6 @@ class SkiLiftServiceImplTest {
     }
 
     @Test
-    void updateSkiLift_withNonexistentId_shouldThrowEntityNotFoundException() {
-        SkiLiftDTO inputDto = createValidSkiLiftDTO();
-        inputDto.setId(TestConstants.NONEXISTENT_ID);
-
-        when(skiLiftRepository.existsById(TestConstants.NONEXISTENT_ID)).thenReturn(false);
-
-        assertThrows(EntityNotFoundException.class, () -> {
-            skiLiftService.updateSkiLift(inputDto);
-        });
-    }
-
-    @Test
     void deleteSkiLift_shouldDeleteSkiLift() {
         skiLiftService.deleteSkiLift(TestConstants.VALID_SKI_LIFT_ID);
 

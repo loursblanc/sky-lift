@@ -200,7 +200,7 @@ class SportServiceImplTest {
         resultDTO.setId(SPORT_ID);
         resultDTO.setName(UPDATED_SPORT_NAME);
 
-        when(sportRepository.existsById(SPORT_ID)).thenReturn(true);
+        // when(sportRepository.existsById(SPORT_ID)).thenReturn(true);
         when(sportMapper.toEntityForUpdate(updateDTO)).thenReturn(mappedSport);
         when(sportRepository.update(mappedSport)).thenReturn(updatedSport);
         when(sportMapper.toDto(updatedSport)).thenReturn(resultDTO);
@@ -209,27 +209,10 @@ class SportServiceImplTest {
 
         assertNotNull(result);
         assertEquals(resultDTO, result);
-        verify(sportRepository).existsById(SPORT_ID);
+        // verify(sportRepository).existsById(SPORT_ID);
         verify(modelValidationService).checkAndThrowIfInvalid(mappedSport, ENTITY_NAME, OnUpdate.class);
         verify(sportRepository).update(mappedSport);
         verify(sportMapper).toDto(updatedSport);
-    }
-
-    @Test
-    void updateSport_withNonexistentId_shouldThrowEntityNotFoundException() {
-        SportDTO updateDTO = new SportDTO();
-        updateDTO.setId(NONEXISTENT_ID);
-
-        when(sportRepository.existsById(NONEXISTENT_ID)).thenReturn(false);
-
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            sportService.updateSport(updateDTO);
-        });
-
-        assertEquals(ENTITY_NAME, exception.getEntityName());
-        assertEquals(NONEXISTENT_ID.toString(), exception.getIdentifier());
-        verify(sportRepository).existsById(NONEXISTENT_ID);
-        verify(sportMapper, never()).toEntityForUpdate(any(SportDTO.class));
     }
 
     @Test

@@ -9,6 +9,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Repository;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
+import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
+import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.EntityNotFoundException;
 import fr.apsprevoyance.skylift.exception.ValidationException;
@@ -94,4 +96,11 @@ public class SkiLiftRepositoryInMemory implements SkiLiftRepository {
 
         return skiLifts.stream().anyMatch(skiLift -> id.equals(skiLift.getId()));
     }
+
+    @Override
+    public List<SkiLift> findByTypeAndStatus(SkiLiftType type, SkiLiftStatus status) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
