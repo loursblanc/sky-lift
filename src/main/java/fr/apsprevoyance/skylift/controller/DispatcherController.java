@@ -29,9 +29,9 @@ import fr.apsprevoyance.skylift.validation.OnUpdate;
 public class DispatcherController {
 
     private static final String SPORT_ENTITY_NAME = "Sport";
-    private static final String SPORT_ID_MISMATCH_ERROR = "L'ID de l'URL ne correspond pas à l'ID du sport dans le corps de la requête";
+    private static final String SPORT_ID_MISMATCH_ERROR = "The URL ID does not match the ID of the sport in the request body";
     private static final String SKILIFT_ENTITY_NAME = "SkiLift";
-    private static final String SKILIFT_ID_MISMATCH_ERROR = "L'ID de l'URL ne correspond pas à l'ID de la remontée dans le corps de la requête";
+    private static final String SKILIFT_ID_MISMATCH_ERROR = "The URL ID does not match the upstream ID in the request body";
 
     private final SportService sportService;
     private final SkiLiftService skiLiftService;
