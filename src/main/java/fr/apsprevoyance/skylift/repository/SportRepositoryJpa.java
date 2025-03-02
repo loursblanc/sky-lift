@@ -23,16 +23,26 @@ import jakarta.transaction.Transactional;
 @Primary
 public class SportRepositoryJpa implements SportRepository {
 
-    @PersistenceContext
     private EntityManager entityManager;
 
     private final SportMapper sportMapper;
 
     private static final String MODEL_NAME = Sport.class.getSimpleName();
     private static final String REPOSITORY_CLASS_NAME = SportRepositoryJpa.class.getSimpleName();
+    private static final String MAPPER_CLASS_NAME = SportMapper.class.getSimpleName();
+    private static final String ENTITYMANAGER_CLASS_NAME = EntityManager.class.getSimpleName();
+
+    private static final String JPQL_COUNT_BY_NAME = "SELECT COUNT(s) FROM SportEntity s WHERE LOWER(s.name) = LOWER(:name)";
 
     public SportRepositoryJpa(SportMapper sportMapper) {
-        this.sportMapper = sportMapper;
+        this.sportMapper = Objects.requireNonNull(sportMapper,
+                String.format(ErrorMessageConstants.Validation.FIELD_NULL, MAPPER_CLASS_NAME));
+    }
+
+    @PersistenceContext
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = Objects.requireNonNull(entityManager,
+                String.format(ErrorMessageConstants.Validation.FIELD_NULL, ENTITYMANAGER_CLASS_NAME));
     }
 
     @Override
@@ -51,8 +61,7 @@ public class SportRepositoryJpa implements SportRepository {
                     ErrorMessageConstants.Errors.NAME_EMPTY);
         }
 
-        TypedQuery<Long> query = entityManager.createQuery("SELECT COUNT(s) FROM SportEntity s WHERE s.name = :name",
-                Long.class);
+        TypedQuery<Long> query = entityManager.createQuery(JPQL_COUNT_BY_NAME, Long.class);
         query.setParameter("name", sportName);
 
         if (query.getSingleResult() > 0) {
