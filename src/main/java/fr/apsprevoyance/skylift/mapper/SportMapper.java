@@ -40,7 +40,6 @@ public abstract class SportMapper {
                 .active(dto.isActive()).season(dto.getSeason());
     }
 
-    // Méthodes Sport -> SportEntity avec implémentation manuelle
     public SportEntity toEntityForCreate(Sport sport) {
         if (sport == null) {
             return null;
