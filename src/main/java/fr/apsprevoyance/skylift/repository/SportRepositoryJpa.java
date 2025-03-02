@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
+import fr.apsprevoyance.skylift.constants.JpqlRequest;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.DuplicateEntityException;
 import fr.apsprevoyance.skylift.exception.ValidationException;
@@ -31,8 +32,6 @@ public class SportRepositoryJpa implements SportRepository {
     private static final String REPOSITORY_CLASS_NAME = SportRepositoryJpa.class.getSimpleName();
     private static final String MAPPER_CLASS_NAME = SportMapper.class.getSimpleName();
     private static final String ENTITYMANAGER_CLASS_NAME = EntityManager.class.getSimpleName();
-
-    private static final String JPQL_COUNT_BY_NAME = "SELECT COUNT(s) FROM SportEntity s WHERE LOWER(s.name) = LOWER(:name)";
 
     public SportRepositoryJpa(SportMapper sportMapper) {
         this.sportMapper = Objects.requireNonNull(sportMapper,
@@ -61,7 +60,7 @@ public class SportRepositoryJpa implements SportRepository {
                     ErrorMessageConstants.Errors.NAME_EMPTY);
         }
 
-        TypedQuery<Long> query = entityManager.createQuery(JPQL_COUNT_BY_NAME, Long.class);
+        TypedQuery<Long> query = entityManager.createQuery(JpqlRequest.SPORT_COUNT_BY_NAME, Long.class);
         query.setParameter("name", sportName);
 
         if (query.getSingleResult() > 0) {

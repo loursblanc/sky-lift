@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
+import fr.apsprevoyance.skylift.constants.JpqlRequest;
 import fr.apsprevoyance.skylift.constants.TestConstants;
 import fr.apsprevoyance.skylift.constants.TestTag;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
@@ -29,7 +30,7 @@ import jakarta.persistence.TypedQuery;
 @ExtendWith(MockitoExtension.class)
 class SportRepositoryJpaTest {
 
-    private static final String JPQL_COUNT_BY_NAME = "SELECT COUNT(s) FROM SportEntity s WHERE s.name = :name";
+    private static final String JPQL_COUNT_BY_NAME = JpqlRequest.SPORT_COUNT_BY_NAME;
     private static final String PARAM_NAME = "name";
     private static final Long COUNT_ZERO = 0L;
     private static final Long COUNT_ONE = 1L;
