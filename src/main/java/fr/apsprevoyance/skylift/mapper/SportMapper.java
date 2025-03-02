@@ -14,7 +14,7 @@ import fr.apsprevoyance.skylift.repository.entity.SportEntity;
 @Component
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public abstract class SportMapper {
-    // Méthodes DTO -> Sport
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "description", defaultValue = "")
     public abstract Sport toEntityForCreate(SportDTO dto);
@@ -52,12 +52,17 @@ public abstract class SportMapper {
     }
 
     @Named("sportToEntityForCreate")
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "id", source = "id")
     public SportEntity toEntityForCreate(Sport sport) {
         if (sport == null) {
+
             return null;
         }
-        return new SportEntity(sport.getName(), sport.getDescription(), sport.getSeason(), sport.isActive());
+        SportEntity entity = new SportEntity(sport.getName(), sport.getDescription(), sport.getSeason(),
+                sport.isActive());
+        entity.setId(sport.getId()); // Ajoute cette ligne pour définir l'ID
+
+        return entity;
     }
 
     @Named("sportToEntityForUpdate")

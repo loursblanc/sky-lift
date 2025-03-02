@@ -66,14 +66,14 @@ public interface SkiLiftMapper {
     @Mapping(target = "commissioningDate", source = "commissioningDate")
     public abstract SkiLiftEntity toEntityForCreate(SkiLift skiLift);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "type", source = "type")
-    @Mapping(target = "status", source = "status")
-    @Mapping(target = "comment", source = "comment")
-    @Mapping(target = "availableSports", source = "availableSports", qualifiedByName = "sportToEntityForUpdate")
-    @Mapping(target = "commissioningDate", source = "commissioningDate")
-    public abstract SkiLiftEntity toEntityForUpdate(SkiLift skiLift);
+    @Mapping(target = "id", source = "skiLift.id")
+    @Mapping(target = "name", source = "skiLift.name")
+    @Mapping(target = "type", source = "skiLift.type")
+    @Mapping(target = "status", source = "skiLift.status")
+    @Mapping(target = "comment", source = "skiLift.comment")
+    @Mapping(target = "availableSports", source = "skiLift.availableSports", qualifiedByName = "sportToEntityForUpdate")
+    @Mapping(target = "commissioningDate", source = "skiLift.commissioningDate")
+    public abstract SkiLiftEntity toEntityForUpdate(SkiLift skiLift, @MappingTarget SkiLiftEntity existingEntity);
 
     default void updateEntityFromDto(SkiLiftDTO dto, @MappingTarget SkiLift.Builder builder) {
         if (dto == null) {

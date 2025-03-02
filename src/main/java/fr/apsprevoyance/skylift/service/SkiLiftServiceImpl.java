@@ -67,10 +67,6 @@ public class SkiLiftServiceImpl implements SkiLiftService {
         Objects.requireNonNull(skiLiftDTO, NULL_SKILIFT_DTO_MESSAGE);
         Objects.requireNonNull(skiLiftDTO.getId(), NULL_SKILIFT_ID_FOR_UPDATE_MESSAGE);
 
-        if (!skiLiftRepository.existsById(skiLiftDTO.getId())) {
-            throw new EntityNotFoundException(ENTITY_NAME, skiLiftDTO.getId().toString());
-        }
-
         SkiLift skiLift = skiLiftMapper.toEntityForUpdate(skiLiftDTO);
         modelValidationService.checkAndThrowIfInvalid(skiLift, ENTITY_NAME, OnUpdate.class);
 

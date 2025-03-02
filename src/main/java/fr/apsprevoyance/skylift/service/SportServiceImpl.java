@@ -71,10 +71,6 @@ public class SportServiceImpl implements SportService {
         Objects.requireNonNull(sportDTO, NULL_SPORT_DTO_MESSAGE);
         Objects.requireNonNull(sportDTO.getId(), NULL_SPORT_ID_FOR_UPDATE_MESSAGE);
 
-        if (!sportRepository.existsById(sportDTO.getId())) {
-            throw new EntityNotFoundException(ENTITY_NAME, sportDTO.getId().toString());
-        }
-
         Sport sport = sportMapper.toEntityForUpdate(sportDTO);
         modelValidationService.checkAndThrowIfInvalid(sport, ENTITY_NAME, OnUpdate.class);
 

@@ -185,7 +185,7 @@ class SkiLiftServiceImplTest {
         expectedDto.setId(TestConstants.VALID_SKI_LIFT_ID);
         expectedDto.setName(TestConstants.UPDATED_SKI_LIFT_NAME);
 
-        when(skiLiftRepository.existsById(TestConstants.VALID_SKI_LIFT_ID)).thenReturn(true);
+        // when(skiLiftRepository.existsById(TestConstants.VALID_SKI_LIFT_ID)).thenReturn(true);
         when(skiLiftMapper.toEntityForUpdate(inputDto)).thenReturn(mappedSkiLift);
         when(skiLiftRepository.update(mappedSkiLift)).thenReturn(updatedSkiLift);
         when(skiLiftMapper.toDto(updatedSkiLift)).thenReturn(expectedDto);
