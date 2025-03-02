@@ -1,5 +1,9 @@
 package fr.apsprevoyance.skylift.mapper;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -8,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import fr.apsprevoyance.skylift.dto.SkiLiftDTO;
 import fr.apsprevoyance.skylift.model.SkiLift;
+import fr.apsprevoyance.skylift.repository.entity.SkiLiftEntity;
 
 @Component
 @Mapper(componentModel = "spring", uses = {
@@ -43,6 +48,33 @@ public interface SkiLiftMapper {
                 .commissioningDate(dto.getCommissioningDate());
     }
 
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "type", source = "type")
+    @Mapping(target = "status", source = "status")
+    @Mapping(target = "comment", source = "comment")
+    @Mapping(target = "availableSports", source = "availableSports")
+    @Mapping(target = "commissioningDate", source = "commissioningDate")
+    public abstract SkiLift toDomain(SkiLiftEntity entity);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "type", source = "type")
+    @Mapping(target = "status", source = "status")
+    @Mapping(target = "comment", source = "comment")
+    @Mapping(target = "availableSports", source = "availableSports", qualifiedByName = "sportToEntityForCreate")
+    @Mapping(target = "commissioningDate", source = "commissioningDate")
+    public abstract SkiLiftEntity toEntityForCreate(SkiLift skiLift);
+
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "type", source = "type")
+    @Mapping(target = "status", source = "status")
+    @Mapping(target = "comment", source = "comment")
+    @Mapping(target = "availableSports", source = "availableSports", qualifiedByName = "sportToEntityForUpdate")
+    @Mapping(target = "commissioningDate", source = "commissioningDate")
+    public abstract SkiLiftEntity toEntityForUpdate(SkiLift skiLift);
+
     default void updateEntityFromDto(SkiLiftDTO dto, @MappingTarget SkiLift.Builder builder) {
         if (dto == null) {
             return;
@@ -75,5 +107,12 @@ public interface SkiLiftMapper {
         if (dto.getCommissioningDate() != null) {
             builder.commissioningDate(dto.getCommissioningDate());
         }
+    }
+
+    default List<SkiLift> toDomainList(List<SkiLiftEntity> entities) {
+        if (entities == null) {
+            return Collections.emptyList();
+        }
+        return entities.stream().map(this::toDomain).collect(Collectors.toList());
     }
 }

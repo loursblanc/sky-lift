@@ -1,4 +1,3 @@
-// SportRepositoryInMemory.java
 package fr.apsprevoyance.skylift.repository;
 
 import java.util.ArrayList;
@@ -7,7 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import fr.apsprevoyance.skylift.constants.ErrorMessageConstants;
@@ -17,7 +15,6 @@ import fr.apsprevoyance.skylift.exception.ValidationException;
 import fr.apsprevoyance.skylift.model.Sport;
 
 @Repository
-@Primary
 public class SportRepositoryInMemory implements SportRepository {
     private static final String ENTITY_NAME = "Sport";
     private static final String REPOSITORY_CLASS_NAME = SportRepositoryInMemory.class.getSimpleName();

@@ -77,7 +77,11 @@ public class SkiLiftEntity {
     @ValidSkiLiftDate(groups = { OnUpdate.class, OnCreate.class, Default.class })
     private LocalDate commissioningDate;
 
-    protected SkiLiftEntity() {
+    // protected SkiLiftEntity() {
+    // }
+
+    // TODO Repasser le constructeur en protected
+    public SkiLiftEntity() {
     }
 
     public SkiLiftEntity(String name, SkiLiftType type, SkiLiftStatus status, String comment,

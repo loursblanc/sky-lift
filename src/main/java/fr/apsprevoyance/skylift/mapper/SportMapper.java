@@ -3,6 +3,7 @@ package fr.apsprevoyance.skylift.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +51,8 @@ public abstract class SportMapper {
                 .active(dto.isActive()).season(dto.getSeason());
     }
 
+    @Named("sportToEntityForCreate")
+    @Mapping(target = "id", ignore = true)
     public SportEntity toEntityForCreate(Sport sport) {
         if (sport == null) {
             return null;
@@ -57,6 +60,7 @@ public abstract class SportMapper {
         return new SportEntity(sport.getName(), sport.getDescription(), sport.getSeason(), sport.isActive());
     }
 
+    @Named("sportToEntityForUpdate")
     public SportEntity toEntityForUpdate(Sport sport) {
         if (sport == null) {
             return null;
