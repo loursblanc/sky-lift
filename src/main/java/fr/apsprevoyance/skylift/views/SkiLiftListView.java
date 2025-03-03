@@ -11,6 +11,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -21,6 +22,7 @@ import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.model.Sport;
 import fr.apsprevoyance.skylift.service.SkiLiftService;
+import fr.apsprevoyance.skylift.service.SportService;
 
 @Route("ski-lifts")
 public class SkiLiftListView extends VerticalLayout {
@@ -29,14 +31,16 @@ public class SkiLiftListView extends VerticalLayout {
      */
     private static final long serialVersionUID = 1L;
     private final SkiLiftService skiLiftService;
+    private final SportService sportService;
     private final Grid<SkiLiftDTO> grid = new Grid<>(SkiLiftDTO.class, false);
 
     // Ajout des filtres
     private final ComboBox<SkiLiftType> typeFilter = new ComboBox<>("Type");
     private final ComboBox<SkiLiftStatus> statusFilter = new ComboBox<>("État");
 
-    public SkiLiftListView(SkiLiftService skiLiftService) {
+    public SkiLiftListView(SkiLiftService skiLiftService, SportService sportService) {
         this.skiLiftService = skiLiftService;
+        this.sportService = sportService;
 
         // Configuration des colonnes de manière explicite
         grid.addColumn(SkiLiftDTO::getName).setHeader("Nom");
@@ -48,8 +52,8 @@ public class SkiLiftListView extends VerticalLayout {
         // Colonne pour les sports disponibles avec tooltip
         grid.addComponentColumn(skiLift -> createSportsComponent(skiLift.getAvailableSports())).setHeader("Sports");
 
-        // Colonne d'actions avec icône de suppression
-        grid.addComponentColumn(this::createDeleteButton).setHeader("Actions").setFlexGrow(0).setWidth("100px")
+        // Colonne d'actions avec boutons d'édition et de suppression
+        grid.addComponentColumn(this::createActionButtons).setHeader("Actions").setFlexGrow(0).setWidth("120px")
                 .setTextAlign(ColumnTextAlign.CENTER);
 
         // Configuration des filtres
@@ -71,13 +75,40 @@ public class SkiLiftListView extends VerticalLayout {
         updateList();
     }
 
-    private Button createDeleteButton(SkiLiftDTO skiLift) {
+    private HorizontalLayout createActionButtons(SkiLiftDTO skiLift) {
+        // Bouton d'édition
+        Button editButton = new Button(new Icon(VaadinIcon.EDIT), e -> openEditDialog(skiLift));
+        editButton.getElement().setAttribute("theme", "icon primary tertiary");
+        editButton.getElement().setAttribute("title", "Modifier");
+
+        // Bouton de suppression
         Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), e -> confirmDelete(skiLift));
-        // deleteButton.addClassName("iconErrorTertiary");
-        // ou
         deleteButton.getElement().setAttribute("theme", "icon error tertiary");
         deleteButton.getElement().setAttribute("title", "Supprimer");
-        return deleteButton;
+
+        HorizontalLayout actions = new HorizontalLayout(editButton, deleteButton);
+        actions.setSpacing(true);
+
+        return actions;
+    }
+
+    private void openEditDialog(SkiLiftDTO skiLift) {
+        Dialog editDialog = new Dialog();
+        editDialog.setWidth("800px");
+        editDialog.setCloseOnEsc(true);
+        editDialog.setCloseOnOutsideClick(false);
+
+        // Créer la vue d'édition et l'ajouter à la boîte de dialogue
+        SkiLiftEditView editView = new SkiLiftEditView(skiLiftService, sportService, skiLift, () -> {
+            // Callback exécuté après une mise à jour réussie
+            updateList();
+            editDialog.close();
+            Notification.show("Remontée mécanique modifiée avec succès", 3000, Notification.Position.MIDDLE);
+        }, () -> editDialog.close() // Callback pour annuler
+        );
+
+        editDialog.add(editView);
+        editDialog.open();
     }
 
     private void confirmDelete(SkiLiftDTO skiLift) {
@@ -113,10 +144,9 @@ public class SkiLiftListView extends VerticalLayout {
         try {
             skiLiftService.deleteSkiLift(skiLift.getId());
             updateList();
-            // Vous pourriez ajouter une notification ici pour indiquer que la suppression a
-            // réussi
+            Notification.show("Remontée mécanique supprimée avec succès", 3000, Notification.Position.MIDDLE);
         } catch (Exception e) {
-            // Gérer l'erreur ici, par exemple avec une notification
+            Notification.show("Erreur lors de la suppression : " + e.getMessage(), 3000, Notification.Position.MIDDLE);
             e.printStackTrace();
         }
     }

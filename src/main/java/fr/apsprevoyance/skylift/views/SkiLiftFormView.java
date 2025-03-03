@@ -8,10 +8,14 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -37,9 +41,9 @@ public class SkiLiftFormView extends VerticalLayout {
     private final SportService sportService;
     private final Binder<SkiLiftDTO> binder;
 
-    // Nouveau tableau pour afficher les sports sélectionnés
-    private final Grid<SportDTO> selectedSportsGrid = new Grid<>(SportDTO.class, false);
+    // Section pour les cartes des sports
     private final VerticalLayout selectedSportsSection = new VerticalLayout();
+    private final FlexLayout sportsCardsLayout = new FlexLayout();
 
     public SkiLiftFormView(SkiLiftService skiLiftService, SportService sportService) {
         this.skiLiftService = skiLiftService;
@@ -69,13 +73,13 @@ public class SkiLiftFormView extends VerticalLayout {
         sportsComboBox.setItems(sportService.findAllSports());
         sportsComboBox.setItemLabelGenerator(SportDTO::getName);
 
-        // Configuration du tableau des sports
-        configureSelectedSportsGrid();
+        // Configuration de la section des cartes de sports
+        configureSportsCardsSection();
 
-        // Ajouter un écouteur pour mettre à jour les détails des sports lorsqu'ils sont
+        // Ajouter un écouteur pour mettre à jour les cartes des sports lorsqu'ils sont
         // sélectionnés
         sportsComboBox.addValueChangeListener(event -> {
-            updateSelectedSportsGrid(event.getValue());
+            updateSportsCards(event.getValue());
         });
 
         DatePicker commissioningDatePicker = new DatePicker("Date de mise en service");
@@ -90,12 +94,6 @@ public class SkiLiftFormView extends VerticalLayout {
 
         // Disposition des éléments
         formLayout.add(nameField, typeSelect, statusSelect, commentArea, sportsComboBox, commissioningDatePicker);
-
-        // Configuration de la section des sports sélectionnés
-        H4 sportsTableTitle = new H4("Sports sélectionnés");
-        selectedSportsSection.add(sportsTableTitle, selectedSportsGrid);
-        selectedSportsSection.setPadding(false);
-        selectedSportsSection.setVisible(false); // Initialement caché
 
         // Création du binder pour la validation
         binder = new Binder<>(SkiLiftDTO.class);
@@ -145,29 +143,142 @@ public class SkiLiftFormView extends VerticalLayout {
         binder.setBean(new SkiLiftDTO());
     }
 
-    private void configureSelectedSportsGrid() {
-        // Configuration des colonnes du tableau similaire à SkiLiftListView
-        selectedSportsGrid.addColumn(SportDTO::getName).setHeader("Nom").setAutoWidth(true);
-        selectedSportsGrid.addColumn(
-                sport -> sport.getDescription() != null && !sport.getDescription().isEmpty() ? sport.getDescription()
-                        : "-")
-                .setHeader("Description").setAutoWidth(true);
-        selectedSportsGrid.addColumn(sport -> sport.getSeason().getLabel()).setHeader("Saison").setAutoWidth(true);
-        selectedSportsGrid.addColumn(sport -> sport.isActive() ? "Oui" : "Non").setHeader("Actif").setAutoWidth(true);
+    private void configureSportsCardsSection() {
+        H4 sectionTitle = new H4("Sports sélectionnés");
 
-        // Définition de la hauteur du tableau
-        selectedSportsGrid.setHeight("200px");
+        // Configuration du layout des cartes
+        sportsCardsLayout.setWidthFull();
+        sportsCardsLayout.getStyle().set("flex-wrap", "wrap").set("gap", "16px").set("justify-content", "flex-start");
+
+        selectedSportsSection.add(sectionTitle, sportsCardsLayout);
+        selectedSportsSection.setVisible(false); // Initialement caché
+        selectedSportsSection.setPadding(true);
+        selectedSportsSection.setSpacing(true);
     }
 
-    private void updateSelectedSportsGrid(Set<SportDTO> selectedSports) {
+    private void updateSportsCards(Set<SportDTO> selectedSports) {
+        sportsCardsLayout.removeAll();
+
         if (selectedSports == null || selectedSports.isEmpty()) {
             selectedSportsSection.setVisible(false);
             return;
         }
 
-        // Mise à jour des données du tableau
-        selectedSportsGrid.setItems(selectedSports);
+        for (SportDTO sport : selectedSports) {
+            sportsCardsLayout.add(createSportCard(sport));
+        }
+
         selectedSportsSection.setVisible(true);
+    }
+
+    private Div createSportCard(SportDTO sport) {
+        // Création de la carte
+        Div card = new Div();
+        card.getStyle().set("background-color", "white").set("border-radius", "8px")
+                .set("box-shadow", "0 2px 6px rgba(0,0,0,0.1)").set("overflow", "hidden").set("width", "240px")
+                .set("min-height", "200px").set("display", "flex").set("flex-direction", "column");
+
+        // Image ou icône représentant le sport
+        Image sportImage = createSportImage(sport);
+        sportImage.setWidth("100%");
+        sportImage.setHeight("120px");
+
+        // Contenu de la carte
+        Div cardContent = new Div();
+        cardContent.getStyle().set("padding", "16px").set("display", "flex").set("flex-direction", "column").set("flex",
+                "1");
+
+        // Titre de la carte (nom du sport)
+        H4 sportName = new H4(sport.getName());
+        sportName.getStyle().set("margin-top", "0").set("margin-bottom", "8px");
+
+        // Description du sport
+        Paragraph description = new Paragraph(
+                sport.getDescription() != null && !sport.getDescription().isEmpty() ? sport.getDescription()
+                        : "Aucune description disponible");
+        description.getStyle().set("margin", "0 0 8px 0").set("font-size", "14px").set("color",
+                "var(--lumo-secondary-text-color)");
+
+        // Informations supplémentaires
+        Div infoSection = new Div();
+        infoSection.getStyle().set("margin-top", "auto").set("font-size", "13px");
+
+        // Saison
+        Span seasonLabel = new Span("Saison: ");
+        seasonLabel.getStyle().set("font-weight", "bold");
+        Span seasonValue = new Span(sport.getSeason().getLabel());
+        Div seasonInfo = new Div(seasonLabel, seasonValue);
+
+        // Statut actif
+        Span activeLabel = new Span("Actif: ");
+        activeLabel.getStyle().set("font-weight", "bold");
+        Span activeValue = new Span(sport.isActive() ? "Oui" : "Non");
+        Div activeInfo = new Div(activeLabel, activeValue);
+
+        infoSection.add(seasonInfo, activeInfo);
+        cardContent.add(sportName, description, infoSection);
+        card.add(sportImage, cardContent);
+
+        return card;
+    }
+
+    private Image createSportImage(SportDTO sport) {
+        // Dans une application réelle, vous chargeriez une image depuis une base de
+        // données
+        // ou un service de fichiers. Ici, nous utilisons des placeholders basés sur le
+        // nom du sport.
+        String imagePath;
+        String sportName = sport.getName().toLowerCase().trim();
+        // Sélectionner une image en fonction du nom du sport String sportName =
+
+        // Utilisation d'un switch avec ==
+        switch (sportName) {
+        case "ski":
+            imagePath = "/images/ski.jpg";
+            break;
+        case "snowboard":
+        case "surf":
+            imagePath = "/images/snowboard.jpg";
+            break;
+        case "snowscoot":
+            imagePath = "/images/snowscoot.jpg";
+            break;
+        case "luge":
+            imagePath = "/images/sledge.jpg";
+            break;
+        default:
+            imagePath = "/images/placeholder.jpg";
+            break;
+        }
+
+        if (sportName.contains("ski")) {
+            imagePath = "/images/ski.jpg";
+        } else if (sportName.contains("surf") || sportName.contains("snowboard")) {
+            imagePath = "/images/snowboard.jpg";
+        } else if (sportName.contains("snowscoot")) {
+            imagePath = "/images/snowscoot.jpg";
+        } else if (sportName.contains("luge")) {
+            imagePath = "/images/sledge.jpg";
+        }
+
+        // Pour l'exemple, nous utilisons un placeholder générique puisque nous n'avons
+        // pas d'images réelles
+        // Dans une application réelle, vous utiliseriez le chemin d'image correct
+        Image image = new Image(imagePath, sport.getName());
+
+        // Comme alternative, nous pouvons utiliser une icône représentative
+        // pour démontrer le concept sans les vrais fichiers image
+        Div iconContainer = new Div();
+        iconContainer.getStyle().set("width", "100%").set("height", "120px").set("display", "flex")
+                .set("align-items", "center").set("justify-content", "center")
+                .set("background-color", "var(--lumo-contrast-10pct)");
+        /*
+         * Icon sportIcon = getSportIcon(sport);
+         * System.out.println(sportIcon.getClassName()); sportIcon.setSize("48px");
+         * sportIcon.setColor("var(--lumo-primary-color)");
+         * iconContainer.add(sportIcon);
+         */
+        return image;
     }
 
     private void saveSkiLift() {
