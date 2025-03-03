@@ -183,6 +183,6 @@ public class SkiLiftListView extends VerticalLayout {
     }
 
     private void navigateToAddView() {
-        // TODO: Implémenter la navigation vers la vue d'ajout
+        getUI().ifPresent(ui -> ui.navigate(SkiLiftFormView.class));
     }
 }
