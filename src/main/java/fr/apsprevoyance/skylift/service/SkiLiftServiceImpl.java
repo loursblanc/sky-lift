@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import fr.apsprevoyance.skylift.dto.SkiLiftDTO;
+import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
+import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.exception.EntityNotFoundException;
 import fr.apsprevoyance.skylift.mapper.SkiLiftMapper;
 import fr.apsprevoyance.skylift.model.SkiLift;
@@ -85,5 +87,14 @@ public class SkiLiftServiceImpl implements SkiLiftService {
     public boolean skiLiftExists(Long id) {
         Objects.requireNonNull(id, NULL_SKILIFT_ID_MESSAGE);
         return skiLiftRepository.existsById(id);
+    }
+
+    @Override
+    public List<SkiLiftDTO> findByTypeAndStatus(SkiLiftType type, SkiLiftStatus status) {
+        List<SkiLift> skiLifts = skiLiftRepository.findByTypeAndStatus(type, status);
+
+        skiLifts.forEach(skiLift -> modelValidationService.checkAndThrowIfInvalid(skiLift, ENTITY_NAME));
+
+        return skiLifts.stream().map(skiLiftMapper::toDto).collect(Collectors.toList());
     }
 }

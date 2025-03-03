@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.apsprevoyance.skylift.dto.SkiLiftDTO;
 import fr.apsprevoyance.skylift.dto.SportDTO;
+import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
+import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.ValidationException;
 import fr.apsprevoyance.skylift.service.SkiLiftService;
@@ -83,8 +86,14 @@ public class DispatcherController {
     }
 
     @GetMapping("/ski-lifts")
-    public ResponseEntity<List<SkiLiftDTO>> getAllSkiLifts() {
-        List<SkiLiftDTO> skiLifts = skiLiftService.findAllSkiLifts();
+    public ResponseEntity<List<SkiLiftDTO>> getSkiLifts(@RequestParam(required = false) SkiLiftType type,
+            @RequestParam(required = false) SkiLiftStatus status) {
+        List<SkiLiftDTO> skiLifts;
+        if (type != null || status != null) {
+            skiLifts = skiLiftService.findByTypeAndStatus(type, status);
+        } else {
+            skiLifts = skiLiftService.findAllSkiLifts();
+        }
         return ResponseEntity.ok(skiLifts);
     }
 
