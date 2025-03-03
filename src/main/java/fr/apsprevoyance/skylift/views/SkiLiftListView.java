@@ -5,9 +5,13 @@ import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -44,6 +48,10 @@ public class SkiLiftListView extends VerticalLayout {
         // Colonne pour les sports disponibles avec tooltip
         grid.addComponentColumn(skiLift -> createSportsComponent(skiLift.getAvailableSports())).setHeader("Sports");
 
+        // Colonne d'actions avec icône de suppression
+        grid.addComponentColumn(this::createDeleteButton).setHeader("Actions").setFlexGrow(0).setWidth("100px")
+                .setTextAlign(ColumnTextAlign.CENTER);
+
         // Configuration des filtres
         setupFilters();
 
@@ -61,6 +69,56 @@ public class SkiLiftListView extends VerticalLayout {
 
         add(filterLayout, buttonLayout, grid);
         updateList();
+    }
+
+    private Button createDeleteButton(SkiLiftDTO skiLift) {
+        Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), e -> confirmDelete(skiLift));
+        // deleteButton.addClassName("iconErrorTertiary");
+        // ou
+        deleteButton.getElement().setAttribute("theme", "icon error tertiary");
+        deleteButton.getElement().setAttribute("title", "Supprimer");
+        return deleteButton;
+    }
+
+    private void confirmDelete(SkiLiftDTO skiLift) {
+        Dialog confirmDialog = new Dialog();
+        confirmDialog.setCloseOnEsc(true);
+        confirmDialog.setCloseOnOutsideClick(false);
+
+        VerticalLayout dialogLayout = new VerticalLayout();
+        dialogLayout.add(
+                new Span("Êtes-vous sûr de vouloir supprimer la remontée mécanique \"" + skiLift.getName() + "\" ?"));
+        dialogLayout.setPadding(true);
+
+        Button confirmButton = new Button("Confirmer", e -> {
+            deleteSkiLift(skiLift);
+            confirmDialog.close();
+        });
+        confirmButton.addClassName("error");
+        confirmButton.addClassName("primary");
+
+        Button cancelButton = new Button("Annuler", e -> confirmDialog.close());
+
+        HorizontalLayout buttonLayout = new HorizontalLayout(cancelButton, confirmButton);
+        buttonLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+        buttonLayout.setWidthFull();
+
+        dialogLayout.add(buttonLayout);
+        confirmDialog.add(dialogLayout);
+
+        confirmDialog.open();
+    }
+
+    private void deleteSkiLift(SkiLiftDTO skiLift) {
+        try {
+            skiLiftService.deleteSkiLift(skiLift.getId());
+            updateList();
+            // Vous pourriez ajouter une notification ici pour indiquer que la suppression a
+            // réussi
+        } catch (Exception e) {
+            // Gérer l'erreur ici, par exemple avec une notification
+            e.printStackTrace();
+        }
     }
 
     private Span createSportsComponent(Set<Sport> sports) {
