@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -90,8 +91,6 @@ class DispatcherControllerTest {
         return dto;
     }
 
-    // Les méthodes de test restent largement identiques
-    // Exemple de méthode de test pour illustrer l'utilisation de Sport
     @Test
     void createSkiLift_shouldDelegateToServiceAndReturnCreatedSkiLift() {
         SkiLiftDTO inputDto = createValidSkiLiftDTO();
@@ -186,17 +185,51 @@ class DispatcherControllerTest {
     }
 
     @Test
-    void findAllSkiLifts_shouldDelegateToServiceAndReturnSkiLiftsList() {
-
+    void findSkiLifts_withNoParameters_shouldDelegateToServiceFindAllAndReturnSkiLiftsList() {
         List<SkiLiftDTO> skiLifts = Collections.singletonList(createValidSkiLiftDTO());
         when(skiLiftService.findAllSkiLifts()).thenReturn(skiLifts);
 
-        ResponseEntity<List<SkiLiftDTO>> response = dispatcherController.getAllSkiLifts();
+        ResponseEntity<List<SkiLiftDTO>> response = dispatcherController.getSkiLifts(null, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().size());
         verify(skiLiftService).findAllSkiLifts();
+        verify(skiLiftService, never()).findByTypeAndStatus(any(), any());
+    }
+
+    @Test
+    void findSkiLifts_withParameters_shouldDelegateToServiceFindByTypeAndStatusAndReturnFilteredList() {
+        SkiLiftType type = SkiLiftType.TELESIEGE;
+        SkiLiftStatus status = SkiLiftStatus.OPEN;
+        List<SkiLiftDTO> filteredSkiLifts = Collections.singletonList(createValidSkiLiftDTO());
+        when(skiLiftService.findByTypeAndStatus(type, status)).thenReturn(filteredSkiLifts);
+
+        ResponseEntity<List<SkiLiftDTO>> response = dispatcherController.getSkiLifts(type, status);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        verify(skiLiftService).findByTypeAndStatus(type, status);
+        verify(skiLiftService, never()).findAllSkiLifts();
+    }
+
+    @Test
+    void findSkiLifts_withTypeOnly_shouldDelegateToServiceFindByTypeAndStatusAndReturnFilteredList() {
+        // Arrange
+        SkiLiftType type = SkiLiftType.TELESIEGE;
+        List<SkiLiftDTO> filteredSkiLifts = Collections.singletonList(createValidSkiLiftDTO());
+        when(skiLiftService.findByTypeAndStatus(type, null)).thenReturn(filteredSkiLifts);
+
+        // Act
+        ResponseEntity<List<SkiLiftDTO>> response = dispatcherController.getSkiLifts(type, null);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        verify(skiLiftService).findByTypeAndStatus(type, null);
+        verify(skiLiftService, never()).findAllSkiLifts();
     }
 
     @Test
