@@ -3,6 +3,7 @@ package fr.apsprevoyance.skylift.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ import fr.apsprevoyance.skylift.repository.entity.SportEntity;
 @Component
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public abstract class SportMapper {
-    // Méthodes DTO -> Sport
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "description", defaultValue = "")
     public abstract Sport toEntityForCreate(SportDTO dto);
@@ -22,6 +23,16 @@ public abstract class SportMapper {
     public abstract Sport toEntityForUpdate(SportDTO dto);
 
     public abstract SportDTO toDto(Sport entity);
+
+    // Méthode supplémentaire pour conversion explicite
+    public Sport fromDtoToEntity(SportDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        return Sport.builder().id(dto.getId()).name(dto.getName()).description(dto.getDescription())
+                .active(dto.isActive()).season(dto.getSeason()).build();
+    }
 
     // Builders
     public Sport.Builder dtoToBuilderForCreate(SportDTO dto) {
@@ -40,14 +51,21 @@ public abstract class SportMapper {
                 .active(dto.isActive()).season(dto.getSeason());
     }
 
-    // Méthodes Sport -> SportEntity avec implémentation manuelle
+    @Named("sportToEntityForCreate")
+    @Mapping(target = "id", source = "id")
     public SportEntity toEntityForCreate(Sport sport) {
         if (sport == null) {
+
             return null;
         }
-        return new SportEntity(sport.getName(), sport.getDescription(), sport.getSeason(), sport.isActive());
+        SportEntity entity = new SportEntity(sport.getName(), sport.getDescription(), sport.getSeason(),
+                sport.isActive());
+        entity.setId(sport.getId()); // Ajoute cette ligne pour définir l'ID
+
+        return entity;
     }
 
+    @Named("sportToEntityForUpdate")
     public SportEntity toEntityForUpdate(Sport sport) {
         if (sport == null) {
             return null;

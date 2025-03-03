@@ -45,7 +45,7 @@ public class SkiLift {
 
     @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.AvaiableSports.NULL)
     @NotEmpty(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.AvaiableSports.EMPTY)
-    private final Set<String> availableSports;
+    private final Set<Sport> availableSports;
 
     @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Date.NULL)
     @ValidSkiLiftDate(groups = { OnUpdate.class, OnCreate.class, Default.class })
@@ -75,7 +75,7 @@ public class SkiLift {
         private SkiLiftType type;
         private SkiLiftStatus status;
         private String comment;
-        private Set<String> availableSports = new HashSet<>();
+        private Set<Sport> availableSports = new HashSet<>();
         private LocalDate commissioningDate = LocalDate.now();
 
         private Builder() {
@@ -106,12 +106,12 @@ public class SkiLift {
             return this;
         }
 
-        public Builder availableSports(Set<String> availableSports) {
+        public Builder availableSports(Set<Sport> availableSports) {
             this.availableSports = availableSports == null ? new HashSet<>() : new HashSet<>(availableSports);
             return this;
         }
 
-        public Builder addAvailableSport(@Nonnull String sport) {
+        public Builder addAvailableSport(@Nonnull Sport sport) {
             this.availableSports.add(sport);
             return this;
         }
@@ -147,7 +147,7 @@ public class SkiLift {
         return comment;
     }
 
-    public Set<String> getAvailableSports() {
+    public Set<Sport> getAvailableSports() {
         return availableSports;
     }
 

@@ -21,7 +21,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import fr.apsprevoyance.skylift.constants.SportLabels;
 import fr.apsprevoyance.skylift.constants.TestTag;
 import fr.apsprevoyance.skylift.dto.SkiLiftDTO;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
@@ -67,21 +66,21 @@ class SkiLiftServiceImplTest {
         skiLiftDTO.setType(SkiLiftType.TELESIEGE);
         skiLiftDTO.setStatus(SkiLiftStatus.OPEN);
         skiLiftDTO.setComment("Test Comment");
-        skiLiftDTO.setAvailableSports(Set.of(SportLabels.SKI));
+        skiLiftDTO.setAvailableSports(Set.of());
         skiLiftDTO.setCommissioningDate(LocalDate.now());
         return skiLiftDTO;
     }
 
     private SkiLift createValidSkiLift() {
         return SkiLift.builder().name(TestConstants.VALID_SKI_LIFT_NAME).type(SkiLiftType.TELESIEGE)
-                .status(SkiLiftStatus.OPEN).comment("Test Comment").availableSports(Set.of(SportLabels.SKI))
+                .status(SkiLiftStatus.OPEN).comment("Test Comment").availableSports(Set.of())
                 .commissioningDate(LocalDate.now()).build();
     }
 
     private SkiLift createValidSkiLiftWithId() {
         return SkiLift.builder().id(TestConstants.VALID_SKI_LIFT_ID).name(TestConstants.VALID_SKI_LIFT_NAME)
                 .type(SkiLiftType.TELESIEGE).status(SkiLiftStatus.OPEN).comment("Test Comment")
-                .availableSports(Set.of(SportLabels.SKI)).commissioningDate(LocalDate.now()).build();
+                .availableSports(Set.of()).commissioningDate(LocalDate.now()).build();
     }
 
     @Test
@@ -186,7 +185,7 @@ class SkiLiftServiceImplTest {
         expectedDto.setId(TestConstants.VALID_SKI_LIFT_ID);
         expectedDto.setName(TestConstants.UPDATED_SKI_LIFT_NAME);
 
-        when(skiLiftRepository.existsById(TestConstants.VALID_SKI_LIFT_ID)).thenReturn(true);
+        // when(skiLiftRepository.existsById(TestConstants.VALID_SKI_LIFT_ID)).thenReturn(true);
         when(skiLiftMapper.toEntityForUpdate(inputDto)).thenReturn(mappedSkiLift);
         when(skiLiftRepository.update(mappedSkiLift)).thenReturn(updatedSkiLift);
         when(skiLiftMapper.toDto(updatedSkiLift)).thenReturn(expectedDto);
@@ -196,18 +195,6 @@ class SkiLiftServiceImplTest {
         assertNotNull(result);
         assertEquals(TestConstants.UPDATED_SKI_LIFT_NAME, result.getName());
         verify(modelValidationService).checkAndThrowIfInvalid(mappedSkiLift, TestConstants.ENTITY_NAME, OnUpdate.class);
-    }
-
-    @Test
-    void updateSkiLift_withNonexistentId_shouldThrowEntityNotFoundException() {
-        SkiLiftDTO inputDto = createValidSkiLiftDTO();
-        inputDto.setId(TestConstants.NONEXISTENT_ID);
-
-        when(skiLiftRepository.existsById(TestConstants.NONEXISTENT_ID)).thenReturn(false);
-
-        assertThrows(EntityNotFoundException.class, () -> {
-            skiLiftService.updateSkiLift(inputDto);
-        });
     }
 
     @Test

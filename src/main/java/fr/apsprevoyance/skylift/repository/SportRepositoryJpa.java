@@ -23,6 +23,7 @@ import jakarta.persistence.NoResultException;
 
 @Repository
 @Primary
+
 public class SportRepositoryJpa implements SportRepository {
 
     private final EntityManager entityManager;

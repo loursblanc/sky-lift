@@ -1,5 +1,7 @@
 package fr.apsprevoyance.skylift.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import fr.apsprevoyance.skylift.constants.AnnotationMessages;
 import fr.apsprevoyance.skylift.constants.ValidationConstants;
 import fr.apsprevoyance.skylift.enums.Season;
@@ -12,6 +14,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.groups.Default;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SportDTO {
 
     @NotNull(groups = OnUpdate.class, message = AnnotationMessages.Id.NULL)
@@ -34,6 +37,11 @@ public class SportDTO {
     @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Season.NULL)
     private Season season;
 
+    // Constructeur par défaut
+    public SportDTO() {
+    }
+
+    // Getters et setters existants (inchangés)
     public Long getId() {
         return id;
     }

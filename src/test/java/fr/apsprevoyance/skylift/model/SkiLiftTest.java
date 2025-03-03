@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import fr.apsprevoyance.skylift.constants.SportLabels;
 import fr.apsprevoyance.skylift.constants.ValidationConstants;
+import fr.apsprevoyance.skylift.enums.Season;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.validation.OnCreate;
@@ -37,8 +38,12 @@ public class SkiLiftTest {
     private static final SkiLiftType VALID_TYPE = SkiLiftType.TELESIEGE;
     private static final SkiLiftStatus VALID_STATUS = SkiLiftStatus.OPEN;
     private static final String VALID_COMMENT = "Un commentaire valide";
-    private static final Set<String> VALID_SPORTS = new HashSet<>(Set.of(SportLabels.SKI, SportLabels.SNOWBOARD));
     private static final LocalDate VALID_DATE = LocalDate.now();
+
+    // Créer un Sport valide pour les tests
+    private static final Sport VALID_SPORT = Sport.builder().name(SportLabels.SKI).season(Season.WINTER).active(true)
+            .build();
+    private static final Set<Sport> VALID_SPORTS = new HashSet<>(Set.of(VALID_SPORT));
 
     @BeforeEach
     public void setUp() {
@@ -48,6 +53,13 @@ public class SkiLiftTest {
         skiLift = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
                 .comment(VALID_COMMENT).availableSports(VALID_SPORTS).commissioningDate(VALID_DATE).build();
     }
+
+    // Méthode utilitaire pour créer un Sport
+    private Sport createSport(String name) {
+        return Sport.builder().name(name).season(Season.WINTER).active(true).build();
+    }
+
+    // Méthodes de test originales avec modifications mineures
 
     @Test
     public void model_with_valid_values_passes_validation() {
@@ -73,6 +85,58 @@ public class SkiLiftTest {
         Set<ConstraintViolation<SkiLift>> violations = validator.validate(skiLiftWithoutId, OnUpdate.class);
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("id")));
+    }
+
+    // ... (Toutes les autres méthodes de test originales restent similaires)
+
+    @Test
+    public void empty_availableSports_fails_validation() {
+        SkiLift skiLiftWithEmptySports = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE)
+                .status(VALID_STATUS).comment(VALID_COMMENT).availableSports(new HashSet<>())
+                .commissioningDate(VALID_DATE).build();
+
+        Set<ConstraintViolation<SkiLift>> violations = validator.validate(skiLiftWithEmptySports, OnCreate.class);
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(
+                v -> v.getPropertyPath().toString().equals("availableSports") && v.getMessage().contains("empty")));
+    }
+
+    @Test
+    public void builder_handles_null_availableSports() {
+        SkiLift skiLiftWithNullSportsHandled = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE)
+                .status(VALID_STATUS).comment(VALID_COMMENT).availableSports(null).commissioningDate(VALID_DATE)
+                .build();
+
+        assertNotNull(skiLiftWithNullSportsHandled.getAvailableSports());
+        assertTrue(skiLiftWithNullSportsHandled.getAvailableSports().isEmpty());
+    }
+
+    @Test
+    public void builder_addAvailableSport_works() {
+        Sport skiSport = createSport(SportLabels.SKI);
+        Sport snowboardSport = createSport(SportLabels.SNOWBOARD);
+
+        SkiLift skiLift = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
+                .comment(VALID_COMMENT).availableSports(new HashSet<>()).addAvailableSport(skiSport)
+                .addAvailableSport(snowboardSport).commissioningDate(VALID_DATE).build();
+
+        assertEquals(2, skiLift.getAvailableSports().size());
+        assertTrue(skiLift.getAvailableSports().stream().anyMatch(s -> s.getName().equals(SportLabels.SKI)));
+        assertTrue(skiLift.getAvailableSports().stream().anyMatch(s -> s.getName().equals(SportLabels.SNOWBOARD)));
+    }
+
+    // Les autres méthodes de test (equals, hashCode, etc.) restent similaires,
+    // avec des ajustements mineurs pour utiliser des objets Sport
+
+    @Test
+    public void equals_should_return_true_for_objects_with_same_values() {
+        Set<Sport> identicalSports = new HashSet<>(
+                Set.of(Sport.builder().name(SportLabels.SKI).season(Season.WINTER).active(true).build()));
+
+        SkiLift identicalSkiLift = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
+                .comment(VALID_COMMENT).availableSports(identicalSports).commissioningDate(VALID_DATE).build();
+
+        assertEquals(skiLift, identicalSkiLift);
     }
 
     @Test
@@ -160,18 +224,6 @@ public class SkiLiftTest {
     }
 
     @Test
-    public void empty_availableSports_fails_validation() {
-        SkiLift skiLiftWithEmptySports = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE)
-                .status(VALID_STATUS).comment(VALID_COMMENT).availableSports(new HashSet<>())
-                .commissioningDate(VALID_DATE).build();
-
-        Set<ConstraintViolation<SkiLift>> violations = validator.validate(skiLiftWithEmptySports, OnCreate.class);
-        assertFalse(violations.isEmpty());
-        assertTrue(violations.stream().anyMatch(
-                v -> v.getPropertyPath().toString().equals("availableSports") && v.getMessage().contains("empty")));
-    }
-
-    @Test
     public void empty_availableSports_not_fails_validation() {
         SkiLift skiLiftWithEmptySports = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE)
                 .status(VALID_STATUS).comment(VALID_COMMENT).availableSports(new HashSet<>())
@@ -232,45 +284,15 @@ public class SkiLiftTest {
     }
 
     @Test
-    public void builder_handles_null_availableSports() {
-        SkiLift skiLiftWithNullSportsHandled = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE)
-                .status(VALID_STATUS).comment(VALID_COMMENT).availableSports(null).commissioningDate(VALID_DATE)
-                .build();
-
-        assertNotNull(skiLiftWithNullSportsHandled.getAvailableSports());
-        assertTrue(skiLiftWithNullSportsHandled.getAvailableSports().isEmpty());
-    }
-
-    @Test
-    public void builder_addAvailableSport_works() {
-        SkiLift skiLift = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
-                .comment(VALID_COMMENT).availableSports(new HashSet<>()).addAvailableSport(SportLabels.SKI)
-                .addAvailableSport(SportLabels.SNOWBOARD).commissioningDate(VALID_DATE).build();
-
-        assertEquals(2, skiLift.getAvailableSports().size());
-        assertTrue(skiLift.getAvailableSports().contains(SportLabels.SKI));
-        assertTrue(skiLift.getAvailableSports().contains(SportLabels.SNOWBOARD));
-    }
-
-    @Test
     public void equals_should_return_true_for_same_object() {
         SkiLift originalSkiLift = skiLift;
         assertEquals(skiLift, originalSkiLift);
     }
 
     @Test
-    public void equals_should_return_true_for_objects_with_same_values() {
-        SkiLift identicalSkiLift = SkiLift.builder().id(VALID_ID).name(VALID_NAME).type(VALID_TYPE).status(VALID_STATUS)
-                .comment(VALID_COMMENT).availableSports(VALID_SPORTS).commissioningDate(VALID_DATE).build();
-
-        assertEquals(skiLift, identicalSkiLift);
-    }
-
-    @Test
     public void equals_should_return_false_for_different_objects() {
         SkiLift differentSkiLift = SkiLift.builder().id(2L).name("Different Lift").type(SkiLiftType.TELESKI)
-                .status(SkiLiftStatus.CLOSED).comment("Different Comment")
-                .availableSports(new HashSet<>(Set.of(SportLabels.SLEDGE)))
+                .status(SkiLiftStatus.CLOSED).comment("Different Comment").availableSports(new HashSet<>(Set.of()))
                 .commissioningDate(LocalDate.now().minusYears(1)).build();
 
         assertNotEquals(skiLift, differentSkiLift);
@@ -297,8 +319,7 @@ public class SkiLiftTest {
     @Test
     public void hashCode_should_be_different_for_different_objects() {
         SkiLift differentSkiLift = SkiLift.builder().id(2L).name("Different Lift").type(SkiLiftType.TELESKI)
-                .status(SkiLiftStatus.CLOSED).comment("Different Comment")
-                .availableSports(new HashSet<>(Set.of(SportLabels.SLEDGE)))
+                .status(SkiLiftStatus.CLOSED).comment("Different Comment").availableSports(new HashSet<>(Set.of()))
                 .commissioningDate(LocalDate.now().minusYears(1)).build();
 
         assertNotEquals(skiLift.hashCode(), differentSkiLift.hashCode());

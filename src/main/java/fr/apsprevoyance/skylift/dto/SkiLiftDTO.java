@@ -8,6 +8,7 @@ import fr.apsprevoyance.skylift.constants.AnnotationMessages;
 import fr.apsprevoyance.skylift.constants.ValidationConstants;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
+import fr.apsprevoyance.skylift.model.Sport;
 import fr.apsprevoyance.skylift.validation.OnCreate;
 import fr.apsprevoyance.skylift.validation.OnUpdate;
 import fr.apsprevoyance.skylift.validation.ValidSkiLiftDate;
@@ -43,7 +44,7 @@ public class SkiLiftDTO {
     private String comment;
 
     @NotEmpty(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Generic.REQUIRED)
-    private Set<String> availableSports = new HashSet<>();
+    private Set<Sport> availableSports = new HashSet<>();
 
     @NotNull(groups = { OnUpdate.class, OnCreate.class }, message = AnnotationMessages.Date.NULL)
     @ValidSkiLiftDate(groups = { OnUpdate.class, OnCreate.class, Default.class })
@@ -89,11 +90,11 @@ public class SkiLiftDTO {
         this.comment = comment != null ? comment : "";
     }
 
-    public Set<String> getAvailableSports() {
+    public Set<Sport> getAvailableSports() {
         return availableSports;
     }
 
-    public void setAvailableSports(Set<String> availableSports) {
+    public void setAvailableSports(Set<Sport> availableSports) {
         this.availableSports = availableSports != null ? availableSports : new HashSet<>();
     }
 

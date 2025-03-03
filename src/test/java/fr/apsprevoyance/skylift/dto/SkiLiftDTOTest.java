@@ -15,8 +15,10 @@ import org.junit.jupiter.api.Test;
 
 import fr.apsprevoyance.skylift.constants.SportLabels;
 import fr.apsprevoyance.skylift.constants.ValidationConstants;
+import fr.apsprevoyance.skylift.enums.Season;
 import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
+import fr.apsprevoyance.skylift.model.Sport;
 import fr.apsprevoyance.skylift.validation.OnCreate;
 import fr.apsprevoyance.skylift.validation.OnUpdate;
 import jakarta.validation.ConstraintViolation;
@@ -35,12 +37,17 @@ public class SkiLiftDTOTest {
     private static final SkiLiftType VALID_TYPE = SkiLiftType.TELESIEGE;
     private static final SkiLiftStatus VALID_STATUS = SkiLiftStatus.OPEN;
     private static final String VALID_COMMENT = "Un commentaire valide";
-    private static final Set<String> VALID_SPORTS = new HashSet<>(Set.of(SportLabels.SKI, SportLabels.SNOWBOARD));
     private static final LocalDate VALID_DATE = LocalDate.now();
+
+    // Créer des Sports valides pour les tests
+    private static final Sport SKI_SPORT = Sport.builder().name(SportLabels.SKI).season(Season.WINTER).active(true)
+            .build();
+    private static final Sport SNOWBOARD_SPORT = Sport.builder().name(SportLabels.SNOWBOARD).season(Season.WINTER)
+            .active(true).build();
+    private static final Set<Sport> VALID_SPORTS = new HashSet<>(Set.of(SKI_SPORT, SNOWBOARD_SPORT));
 
     @BeforeEach
     public void setUp() {
-
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
 
@@ -52,6 +59,72 @@ public class SkiLiftDTOTest {
         dto.setComment(VALID_COMMENT);
         dto.setAvailableSports(VALID_SPORTS);
         dto.setCommissioningDate(VALID_DATE);
+    }
+
+    // Méthode utilitaire pour créer un Sport
+    private Sport createSport(String name) {
+        return Sport.builder().name(name).season(Season.WINTER).active(true).build();
+    }
+
+    // Les méthodes de test restent similaires, avec des ajustements pour utiliser
+    // des Sport
+
+    @Test
+    public void empty_availableSports_fails_validation() {
+        dto.setAvailableSports(new HashSet<>());
+
+        Set<ConstraintViolation<SkiLiftDTO>> violations = validator.validate(dto, OnCreate.class);
+
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("availableSports")));
+    }
+
+    @Test
+    public void null_availableSports_is_replaced_with_empty_set() {
+        dto.setAvailableSports(null);
+
+        assertNotNull(dto.getAvailableSports());
+        assertTrue(dto.getAvailableSports().isEmpty());
+    }
+
+    @Test
+    public void getters_and_setters_work_correctly() {
+        assertEquals(VALID_ID, dto.getId());
+        assertEquals(VALID_NAME, dto.getName());
+        assertEquals(VALID_TYPE, dto.getType());
+        assertEquals(VALID_STATUS, dto.getStatus());
+        assertEquals(VALID_COMMENT, dto.getComment());
+        assertEquals(VALID_SPORTS, dto.getAvailableSports());
+        assertEquals(VALID_DATE, dto.getCommissioningDate());
+
+        // Test setters with new values
+        Long newId = 2L;
+        String newName = "Nouveau Télésiège";
+        SkiLiftType newType = SkiLiftType.TELESKI;
+        SkiLiftStatus newStatus = SkiLiftStatus.CLOSED;
+        String newComment = "Nouveau commentaire";
+
+        // Créer un nouvel ensemble de Sports
+        Sport snowscootSport = createSport(SportLabels.SNOWSCOOT);
+        Set<Sport> newSports = new HashSet<>(Set.of(snowscootSport));
+
+        LocalDate newDate = LocalDate.now().plusDays(1);
+
+        dto.setId(newId);
+        dto.setName(newName);
+        dto.setType(newType);
+        dto.setStatus(newStatus);
+        dto.setComment(newComment);
+        dto.setAvailableSports(newSports);
+        dto.setCommissioningDate(newDate);
+
+        assertEquals(newId, dto.getId());
+        assertEquals(newName, dto.getName());
+        assertEquals(newType, dto.getType());
+        assertEquals(newStatus, dto.getStatus());
+        assertEquals(newComment, dto.getComment());
+        assertEquals(newSports, dto.getAvailableSports());
+        assertEquals(newDate, dto.getCommissioningDate());
     }
 
     @Test
@@ -157,24 +230,6 @@ public class SkiLiftDTOTest {
     }
 
     @Test
-    public void empty_availableSports_fails_validation() {
-        dto.setAvailableSports(new HashSet<>());
-
-        Set<ConstraintViolation<SkiLiftDTO>> violations = validator.validate(dto, OnCreate.class);
-
-        assertFalse(violations.isEmpty());
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("availableSports")));
-    }
-
-    @Test
-    public void null_availableSports_is_replaced_with_empty_set() {
-        dto.setAvailableSports(null);
-
-        assertNotNull(dto.getAvailableSports());
-        assertTrue(dto.getAvailableSports().isEmpty());
-    }
-
-    @Test
     public void null_commissioning_date_fails_validation() {
         dto.setCommissioningDate(null);
 
@@ -218,39 +273,4 @@ public class SkiLiftDTOTest {
         assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("comment")));
     }
 
-    @Test
-    public void getters_and_setters_work_correctly() {
-        assertEquals(VALID_ID, dto.getId());
-        assertEquals(VALID_NAME, dto.getName());
-        assertEquals(VALID_TYPE, dto.getType());
-        assertEquals(VALID_STATUS, dto.getStatus());
-        assertEquals(VALID_COMMENT, dto.getComment());
-        assertEquals(VALID_SPORTS, dto.getAvailableSports());
-        assertEquals(VALID_DATE, dto.getCommissioningDate());
-
-        // Test setters with new values
-        Long newId = 2L;
-        String newName = "Nouveau Télésiège";
-        SkiLiftType newType = SkiLiftType.TELESKI;
-        SkiLiftStatus newStatus = SkiLiftStatus.CLOSED;
-        String newComment = "Nouveau commentaire";
-        Set<String> newSports = new HashSet<>(Set.of(SportLabels.SNOWSCOOT));
-        LocalDate newDate = LocalDate.now().plusDays(1);
-
-        dto.setId(newId);
-        dto.setName(newName);
-        dto.setType(newType);
-        dto.setStatus(newStatus);
-        dto.setComment(newComment);
-        dto.setAvailableSports(newSports);
-        dto.setCommissioningDate(newDate);
-
-        assertEquals(newId, dto.getId());
-        assertEquals(newName, dto.getName());
-        assertEquals(newType, dto.getType());
-        assertEquals(newStatus, dto.getStatus());
-        assertEquals(newComment, dto.getComment());
-        assertEquals(newSports, dto.getAvailableSports());
-        assertEquals(newDate, dto.getCommissioningDate());
-    }
 }

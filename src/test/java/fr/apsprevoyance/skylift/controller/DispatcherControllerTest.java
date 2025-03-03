@@ -28,6 +28,7 @@ import fr.apsprevoyance.skylift.enums.SkiLiftStatus;
 import fr.apsprevoyance.skylift.enums.SkiLiftType;
 import fr.apsprevoyance.skylift.enums.ValidationContextType;
 import fr.apsprevoyance.skylift.exception.ValidationException;
+import fr.apsprevoyance.skylift.model.Sport;
 import fr.apsprevoyance.skylift.service.SkiLiftService;
 import fr.apsprevoyance.skylift.service.SportService;
 
@@ -35,7 +36,6 @@ import fr.apsprevoyance.skylift.service.SportService;
 class DispatcherControllerTest {
 
     private static final class TestConstants {
-
         static final Long SPORT_VALID_ID = 1L;
         static final Long SPORT_DIFFERENT_ID = 2L;
         static final String SPORT_NAME = "Ski Alpin";
@@ -60,6 +60,11 @@ class DispatcherControllerTest {
         dispatcherController = new DispatcherController(sportService, skiLiftService);
     }
 
+    // Méthode utilitaire pour créer un Sport
+    private Sport createSport(String name) {
+        return Sport.builder().name(name).season(Season.WINTER).active(true).build();
+    }
+
     private SportDTO createValidSportDTO() {
         SportDTO dto = new SportDTO();
         dto.setId(TestConstants.SPORT_VALID_ID);
@@ -68,6 +73,36 @@ class DispatcherControllerTest {
         dto.setSeason(Season.WINTER);
         dto.setActive(true);
         return dto;
+    }
+
+    private SkiLiftDTO createValidSkiLiftDTO() {
+        // Créer un Sport de ski
+        Sport skiSport = createSport(SportLabels.SKI);
+
+        SkiLiftDTO dto = new SkiLiftDTO();
+        dto.setId(TestConstants.SKI_LIFT_VALID_ID);
+        dto.setName(TestConstants.SKI_LIFT_NAME);
+        dto.setType(SkiLiftType.TELESIEGE);
+        dto.setStatus(SkiLiftStatus.OPEN);
+        dto.setComment("Test Comment");
+        dto.setAvailableSports(Set.of(skiSport));
+        dto.setCommissioningDate(LocalDate.now());
+        return dto;
+    }
+
+    // Les méthodes de test restent largement identiques
+    // Exemple de méthode de test pour illustrer l'utilisation de Sport
+    @Test
+    void createSkiLift_shouldDelegateToServiceAndReturnCreatedSkiLift() {
+        SkiLiftDTO inputDto = createValidSkiLiftDTO();
+        when(skiLiftService.createSkiLift(any(SkiLiftDTO.class))).thenReturn(inputDto);
+
+        ResponseEntity<SkiLiftDTO> response = dispatcherController.createSkiLift(inputDto);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(inputDto, response.getBody());
+        verify(skiLiftService).createSkiLift(inputDto);
     }
 
     @Test
@@ -148,33 +183,6 @@ class DispatcherControllerTest {
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(sportService).deleteSport(TestConstants.SPORT_VALID_ID);
-    }
-
-    // SKI LIFT TESTS
-    private SkiLiftDTO createValidSkiLiftDTO() {
-        SkiLiftDTO dto = new SkiLiftDTO();
-        dto.setId(TestConstants.SKI_LIFT_VALID_ID);
-        dto.setName(TestConstants.SKI_LIFT_NAME);
-        dto.setType(SkiLiftType.TELESIEGE);
-        dto.setStatus(SkiLiftStatus.OPEN);
-        dto.setComment("Test Comment");
-        dto.setAvailableSports(Set.of(SportLabels.SKI));
-        dto.setCommissioningDate(LocalDate.now());
-        return dto;
-    }
-
-    @Test
-    void createSkiLift_shouldDelegateToServiceAndReturnCreatedSkiLift() {
-
-        SkiLiftDTO inputDto = createValidSkiLiftDTO();
-        when(skiLiftService.createSkiLift(any(SkiLiftDTO.class))).thenReturn(inputDto);
-
-        ResponseEntity<SkiLiftDTO> response = dispatcherController.createSkiLift(inputDto);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(inputDto, response.getBody());
-        verify(skiLiftService).createSkiLift(inputDto);
     }
 
     @Test

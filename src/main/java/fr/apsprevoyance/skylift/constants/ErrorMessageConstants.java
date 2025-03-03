@@ -31,6 +31,7 @@ public final class ErrorMessageConstants {
         public static final String DUPLICATE_ENTITY_SAFE = "A %s with these details already exists";
         public static final String ERROR_DUPLICATE_MESSAGE = "Entity %s with %s %s already exists";
         public static final String ENTITY_NOT_FOUND = "Entity %s with id %s not found";
+
     }
 
     public static final class Fields {
@@ -74,6 +75,11 @@ public final class ErrorMessageConstants {
         public static final String SPORT_NULL = String.format(Validation.FIELD_NULL, Fields.SPORT);
         public static final String SPORT_ID_PREDEFINED = String.format(Validation.FIELD_PREDEFINED, Fields.SPORT,
                 Fields.ID);
+
+        public static final String SKILIFT_NULL = "The ski lift cannot be null";
+        public static final String SKILIFT_ID_PREDEFINED = "The ski lift ID must not be predefined for creation";
+        public static final String SPORT_ID_NULL = "The ID of sport '%s' cannot be null";
+        public static final String SKILIFT_ID_NULL = "SkiliftId null";
 
     }
 
